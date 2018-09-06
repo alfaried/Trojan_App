@@ -23,12 +23,11 @@ Next you want to set up the cronjob to automatically run the application to rais
 ```
 $ deactivate
 $ cd ~
-$ nano crontab -e
+$ export VISUAL=nano; crontab -e
 ```
-Once within the text editor, add this line: 
+Once within the text editor, add this line:
 ````
 @reboot bash /home/ec2-user/.trojan/trojan_env/Trojan_App/start.sh
 ````
 
 Then press **'Ctrl+X'**, **'y'** and hit **ENTER** and you're good to go. Th moment you reboot the linux instance, the application will automatically run and raise those endpoints for you to call. ENJOY!
-
