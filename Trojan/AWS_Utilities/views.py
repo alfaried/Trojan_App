@@ -38,7 +38,8 @@ def killInstance(request):
 def getInstanceInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
-    instance = getInstance()
+    instance_id = getInstanceID()
+    instance = getInstance(instance_id)
 
     response['instance_id'] = instance.instance_id
     response['instance_public_ip'] = instance.public_ip_address
