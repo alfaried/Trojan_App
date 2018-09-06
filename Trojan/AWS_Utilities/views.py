@@ -64,7 +64,7 @@ def getCloudWatchInfo(request):
     name = request.GET.get('name')
 
     try:
-        client = boto3.resource('cloudwatch')
+        cloudwatch = boto3.resource('cloudwatch')
         metric = cloudwatch.Metric(namespace,name)
 
         response['metric_dimensions'] = metric.dimensions
