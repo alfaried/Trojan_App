@@ -14,7 +14,7 @@ import os
 import ipgetter
 
 # Get public ip of server
-public_IP = ipgetter.myip()
+PUBLIC_IP = ipgetter.myip()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +29,7 @@ SECRET_KEY = 'u4s$_5t0n2cw*i-@eh4e)aygcw+_au#nts^9tt(@m81^m(sm0m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1',public_IP]
+ALLOWED_HOSTS = ['localhost','127.0.0.1',PUBLIC_IP]
 
 
 # Application definition
