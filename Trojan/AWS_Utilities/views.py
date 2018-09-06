@@ -58,15 +58,20 @@ def getInstanceInfo(request):
     return JsonResponse(response)
 
 def getCloudWatchInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
 
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+    try:
+        client = boto3.resource('cloudwatch')
+        metric = cloudwatch.Metric(namespace,name)
 
-    client = boto3.resource('cloudwatch')
-    metric = cloudwatch.Metric(namespace,name)
-
-    response['metric_dimensions'] = metric.dimensions
-    response['metric_metric_name'] = metric.metric_name
+        response['metric_dimensions'] = metric.dimensions
+        response['metric_metric_name'] = metric.metric_name
+    except Exception as e:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
 
     return JsonResponse(response)
