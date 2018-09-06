@@ -1,4 +1,5 @@
 import boto3
+import traceback
 from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
@@ -70,6 +71,7 @@ def getCloudWatchInfo(request):
         response['metric_dimensions'] = metric.dimensions
         response['metric_metric_name'] = metric.metric_name
     except Exception as e:
+        traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
