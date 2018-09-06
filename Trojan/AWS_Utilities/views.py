@@ -44,11 +44,15 @@ def getInstanceInfo(request):
     response['instance_id'] = instance.instance_id
     response['instance_public_ip'] = instance.public_ip_address
     response['instance_public_dns_name'] = instance.public_dns_name
+    response['instance_private_ip_address'] = instance.private_ip_address
+    response['instance_private_dns_name'] = instance.private_dns_name
     response['instance_type'] = instance.instance_type
     response['instance_kernel_id'] = instance.kernel_id
     response['instance_security_groups'] = instance.security_groups
     response['instance_state'] = instance.state
     response['instance_subnet_id'] = instance.subnet_id
     response['instance_tags'] = instance.tags
+    response['instance_vpc_id'] = instance.vpc_id
+    response['instance_launch_time'] = instance.launch_time
 
     return JsonResponse(response)
