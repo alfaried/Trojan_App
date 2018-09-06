@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
 from AWS_Utilities.src.aws_utils import *
+from botocore.exceptions import ClientError
 
 def test(request):
     response = {'status':'OK', 'code':'200'}
