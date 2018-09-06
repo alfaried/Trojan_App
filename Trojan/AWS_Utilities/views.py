@@ -38,7 +38,7 @@ def killInstance(request):
 def getInstanceInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
-    instance_id = getInstanceID()
+    instance_id = getCurrentInstanceID()
     instance = getInstance(instance_id)
 
     response['instance_id'] = instance.instance_id
@@ -54,5 +54,19 @@ def getInstanceInfo(request):
     response['instance_tags'] = instance.tags
     response['instance_vpc_id'] = instance.vpc_id
     response['instance_launch_time'] = instance.launch_time
+
+    return JsonResponse(response)
+
+def getCloudWatchInfo(request):
+    namespace = request.GET.get('namespace')
+    name = request.GET.get('name')
+
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+
+    client = boto3.resource('cloudwatch')
+    metric = cloudwatch.Metric(namespace,name)
+
+    response['metric_dimensions'] = metric.dimensions
+    response['metric_metric_name'] = metric.metric_name
 
     return JsonResponse(response)
