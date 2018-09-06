@@ -12,7 +12,7 @@ def test(request):
 def killInstance(request):
     response = {'status':'OK', 'code':'200'}
 
-    instance_id = getInstanceID()
+    instance_id,results = getInstanceID()
     ec2 = boto3.client('ec2')
 
     # Do a dryrun first to verify permissions
