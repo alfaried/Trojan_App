@@ -78,8 +78,8 @@ def getCloudWatchMetricInfo(request):
         metric = cloudwatch.Metric(namespace,name)
 
         dimensions = metric.dimensions
-        startTime = datetime(2018, 8, 31)
-        endTime = startTime + timedelta(hours=3)
+        endTime = datetime.now()
+        startTime = endTime - timedelta(hours=3)
         period = 300
 
         statistics = metric.get_statistics(
