@@ -67,6 +67,15 @@ def getInstanceInfo(request):
 
     return JsonResponse(response)
 
+def getCloudWatchMetric(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+
+    cloudwatch = boto3.resource('cloudwatch')
+    metric = cloudwatch.Metric(namespace,name)
+    response['subresources'] = metric.get_available_subresources()
+
+    return JsonResponse(response)
+
 def getCloudWatchMetricInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
