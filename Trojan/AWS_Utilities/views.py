@@ -70,6 +70,9 @@ def getInstanceInfo(request):
 def getCloudWatchMetric(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
+    namespace = request.GET.get('namespace')
+    name = request.GET.get('name')
+
     cloudwatch = boto3.resource('cloudwatch')
     metric = cloudwatch.Metric(namespace,name)
     response['subresources'] = metric.get_available_subresources()
