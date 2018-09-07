@@ -14,7 +14,7 @@ def test(request):
 def killInstance(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
-    instance_id = getInstanceID()
+    instance_id = getCurrentInstanceID()
     ec2 = boto3.client('ec2')
 
     # Do a dryrun first to verify permissions
