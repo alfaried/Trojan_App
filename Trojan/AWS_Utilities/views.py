@@ -11,10 +11,11 @@ def test(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
     return JsonResponse(response)
 
+
 def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
-    instance_id = getCurrentInstanceID()
+    instance_id = getInstanceID()
     ec2 = boto3.client('ec2')
 
     # Do a dryrun first to verify permissions
@@ -37,10 +38,11 @@ def instance_stop(request):
 
     return JsonResponse(response)
 
+
 def instance_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
-    instance_id = getCurrentInstanceID()
+    instance_id = getInstanceID()
     ec2 = boto3.resource('ec2')
     instance = ec2.Instance(instance_id)
 
@@ -67,6 +69,11 @@ def instance_getInfo(request):
 
     return JsonResponse(response)
 
+# Request:
+# - namespace
+# - name
+# - period
+#
 def cloudwatch_getMetric(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
@@ -104,18 +111,27 @@ def cloudwatch_getMetric(request):
 
     return JsonResponse(response)
 
+# Request:
+# - namespace
+#
 def cloudwatch_getAvailableMetrics(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
-    instance_id = getCurrentInstanceID()
     namespace = request.GET.get('namespace')
+
+    instance_id = getInstanceID()
+    dimensions_name = 'InstanceId'
+
+    if EBS in namespace:
+        volume_id = getVolumeID()
+        dimensions_name = 'VolumeId'
 
     client = boto3.client('cloudwatch')
     results = client.list_metrics(
         Namespace=namespace,
         Dimensions=[
             {
-                'Name':"InstanceId",
+                'Name':dimensions_name,
                 'Value':instance_id
             },
         ],
