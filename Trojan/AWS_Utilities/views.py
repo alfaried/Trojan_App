@@ -57,7 +57,7 @@ def getInstanceInfo(request):
         response['instance_tags'] = instance.tags
         response['instance_vpc_id'] = instance.vpc_id
         response['instance_launch_time'] = instance.launch_time
-    except:
+    except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
