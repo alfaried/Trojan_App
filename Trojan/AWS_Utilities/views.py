@@ -104,18 +104,21 @@ def cloudwatch_getMetric(request):
 
     return JsonResponse(response)
 
-def cloudwatch(request):
+def cloudwatch_getAvailableMetrics(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+
+    instance_id = getCurrentInstanceID()
 
     client = boto3.client('cloudwatch')
     results = client.list_metrics(
         Dimensions=[
             {
                 'Name':"InstanceId"
+                'Value':instance_id
             },
         ]
     )
 
-    response['results'] = results
+    response['available_metrics'] = results
 
     return JsonResponse(response)
