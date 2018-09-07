@@ -122,7 +122,7 @@ def cloudwatch_getAvailableMetrics(request):
     instance_id = getInstanceID()
     dimensions_name = 'InstanceId'
 
-    if EBS in namespace:
+    if 'EBS' in namespace:
         volume_id = getVolumeID()
         dimensions_name = 'VolumeId'
 
