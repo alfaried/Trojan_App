@@ -86,7 +86,7 @@ def getCloudWatchInfo(request):
             EndTime=endTime,
             Period=period,
             Statistics=[
-                'SampleCount'|'Average'|'Sum'|'Minimum'|'Maximum',
+                'SampleCount','Average','Sum','Minimum','Maximum',
             ],
         )
 
