@@ -119,11 +119,11 @@ def cloudwatch_getAvailableMetrics(request):
 
     namespace = request.GET.get('namespace')
 
-    instance_id = getInstanceID()
+    value = getInstanceID()
     dimensions_name = 'InstanceId'
 
     if 'EBS' in namespace:
-        volume_id = getVolumeID()
+        value = getVolumeID()
         dimensions_name = 'VolumeId'
 
     client = boto3.client('cloudwatch')
@@ -132,7 +132,7 @@ def cloudwatch_getAvailableMetrics(request):
         Dimensions=[
             {
                 'Name':dimensions_name,
-                'Value':instance_id
+                'Value':value
             },
         ],
     )
