@@ -7,11 +7,13 @@ from Trojan.settings import PUBLIC_IP
 from AWS_Utilities.src.aws_utils import *
 from botocore.exceptions import ClientError
 
+
 def test(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
     return JsonResponse(response)
 
-
+# Request:
+#
 def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
@@ -38,7 +40,8 @@ def instance_stop(request):
 
     return JsonResponse(response)
 
-
+# Request:
+#
 def instance_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
