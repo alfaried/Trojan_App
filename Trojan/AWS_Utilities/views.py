@@ -1,6 +1,6 @@
 import boto3
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
@@ -78,7 +78,7 @@ def getCloudWatchInfo(request):
 
         dimensions = metric.dimensions
         startTime = datetime(2018, 8, 31)
-        endTime = datetime(2018, 9, 30)
+        endTime = startTime - timedelta(days=7)
 
         statistics = metric.get_statistics(
             Dimensions=dimensions,
