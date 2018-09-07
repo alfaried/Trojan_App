@@ -86,7 +86,7 @@ def getCloudWatchMetricInfo(request):
             Dimensions=dimensions,
             StartTime=startTime.isoformat(),
             EndTime=endTime.isoformat(),
-            Period=period,
+            Period=int(period),
             Statistics=[
                 'SampleCount','Average','Sum','Minimum','Maximum',
             ],
