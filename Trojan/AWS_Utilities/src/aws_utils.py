@@ -13,5 +13,6 @@ def getVolumeID():
     ec2 = boto3.resource('ec2')
     instance = ec2.Instance(instance_id)
     volume_iterator = instance.volumes.all()
+    volume_ids = [v.id for v in volume_iterator]
 
-    return volume_iterator[0]
+    return volume_ids[0]
