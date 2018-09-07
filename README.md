@@ -2,7 +2,7 @@
 
 A Django web application that raises endpoints within your EC2 Linux instance. To use this application, clone the repo into a hidden folder within the root directory of your ec2-user.
 
-*Do take note that this will only work if the user has already configure their aws .config and .credentials file*
+*\*Do take note that this will only work if the user has already configure their aws .config and .credentials file*
 
 ## Instructions
 
