@@ -72,15 +72,15 @@ def getCloudWatchMetricInfo(request):
 
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
+    period = request.GET.get('period')
 
     try:
         cloudwatch = boto3.resource('cloudwatch')
         metric = cloudwatch.Metric(namespace,name)
 
         dimensions = metric.dimensions
-        endTime = datetime(2018,9,7)
-        startTime = datetime(2018,9,6)
-        period = 300
+        endTime = datetime.now().isoformat()
+        startTime = endTime - timedelta(days=1)
 
         statistics = metric.get_statistics(
             Dimensions=dimensions,
