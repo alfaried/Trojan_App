@@ -137,6 +137,8 @@ def cloudwatch_getAvailableMetrics(request):
         ],
     )
 
-    response['Available_Metrics'] = results
+    response['Namespace'] = namespace
+    response['Dimensions_Name'] = dimensions_name
+    response.update(results)
 
     return JsonResponse(response)
