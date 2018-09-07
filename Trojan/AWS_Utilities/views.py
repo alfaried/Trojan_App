@@ -108,12 +108,14 @@ def cloudwatch(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
     client = boto3.client('cloudwatch')
-    client.list_metrics(
+    results = client.list_metrics(
         Dimensions=[
             {
                 'Name':"InstanceId"
             },
         ]
     )
+
+    response['results'] = results
 
     return JsonResponse(response)
