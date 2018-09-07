@@ -128,6 +128,8 @@ def cloudwatch_getAvailableMetrics(request):
     if 'EBS' in namespace:
         value = getVolumeID()
         dimensions_name = 'VolumeId'
+    # to-do:
+    # Configure to take in more parameters instead of just EC2 and EBS
 
     client = boto3.client('cloudwatch')
     results = client.list_metrics(
