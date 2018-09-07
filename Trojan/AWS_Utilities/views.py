@@ -1,5 +1,6 @@
 import boto3
 import traceback
+from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
@@ -69,15 +70,16 @@ def getCloudWatchInfo(request):
 
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
-    startTime = request.GET.get('startTime')
-    endTime = request.GET.get('endTime')
-    period = request.GET.get('period')
+    period = int(request.GET.get('period'))
 
     try:
         cloudwatch = boto3.resource('cloudwatch')
         metric = cloudwatch.Metric(namespace,name)
 
         dimensions = metric.dimensions
+        startTime = datetime(2015, 1, 1)
+        endTime = datetime(2015, 1, 1)
+
         statistics = metric.get_statistics(
             Dimensions=dimensions,
             StartTime=startTime,
