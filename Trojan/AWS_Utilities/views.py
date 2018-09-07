@@ -42,19 +42,25 @@ def getInstanceInfo(request):
     instance_id = getCurrentInstanceID()
     instance = getInstance(instance_id)
 
-    response['instance_id'] = instance.instance_id
-    response['instance_public_ip'] = instance.public_ip_address
-    response['instance_public_dns_name'] = instance.public_dns_name
-    response['instance_private_ip_address'] = instance.private_ip_address
-    response['instance_private_dns_name'] = instance.private_dns_name
-    response['instance_type'] = instance.instance_type
-    response['instance_kernel_id'] = instance.kernel_id
-    response['instance_security_groups'] = instance.security_groups
-    response['instance_state'] = instance.state
-    response['instance_subnet_id'] = instance.subnet_id
-    response['instance_tags'] = instance.tags
-    response['instance_vpc_id'] = instance.vpc_id
-    response['instance_launch_time'] = instance.launch_time
+    try:
+        response['instance_id'] = instance.instance_id
+        response['instance_public_ip'] = instance.public_ip_address
+        response['instance_public_dns_name'] = instance.public_dns_name
+        response['instance_private_ip_address'] = instance.private_ip_address
+        response['instance_private_dns_name'] = instance.private_dns_name
+        response['instance_type'] = instance.instance_type
+        response['instance_kernel_id'] = instance.kernel_id
+        response['instance_security_groups'] = instance.security_groups
+        response['instance_state'] = instance.state
+        response['instance_subnet_id'] = instance.subnet_id
+        response['instance_tags'] = instance.tags
+        response['instance_vpc_id'] = instance.vpc_id
+        response['instance_launch_time'] = instance.launch_time
+    except:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
 
     return JsonResponse(response)
 
@@ -63,13 +69,32 @@ def getCloudWatchInfo(request):
 
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
+    startTime = request.GET.get('startTime')
+    endTime = request.GET.get('endTime')
+    period = request.GET.get('period')
 
     try:
         cloudwatch = boto3.resource('cloudwatch')
         metric = cloudwatch.Metric(namespace,name)
 
-        response['metric_dimensions'] = metric.dimensions
+        dimensions = metric.dimensions
+        statistics = metric.get_statistics(
+            Dimensions=dimensions,
+            StartTime=startTime,
+            EndTime=endTime,
+            Period=period,
+            Statistics=[
+                'SampleCount'|'Average'|'Sum'|'Minimum'|'Maximum',
+            ],
+            ExtendedStatistics=[
+                'string',
+            ],
+            Unit='Seconds'|'Microseconds'|'Milliseconds'|'Bytes'|'Kilobytes'|'Megabytes'|'Gigabytes'|'Terabytes'|'Bits'|'Kilobits'|'Megabits'|'Gigabits'|'Terabits'|'Percent'|'Count'|'Bytes/Second'|'Kilobytes/Second'|'Megabytes/Second'|'Gigabytes/Second'|'Terabytes/Second'|'Bits/Second'|'Kilobits/Second'|'Megabits/Second'|'Gigabits/Second'|'Terabits/Second'|'Count/Second'|'None'
+        )
+
+        response['metric_dimensions'] = dimensions
         response['metric_metric_name'] = metric.metric_name
+        response['metric_statistics'] = statistics
     except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
