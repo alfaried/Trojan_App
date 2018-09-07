@@ -41,7 +41,7 @@ def getInstanceInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
     instance_id = getCurrentInstanceID()
-    instance = getCurrentInstanceID(instance_id)
+    instance = getInstance(instance_id)
 
     try:
         response['instance_id'] = instance.instance_id
