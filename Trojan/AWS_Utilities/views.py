@@ -113,7 +113,7 @@ def cloudwatch_getAvailableMetrics(request):
     results = client.list_metrics(
         Dimensions=[
             {
-                'Name':"InstanceId"
+                'Name':"InstanceId",
                 'Value':instance_id
             },
         ]
