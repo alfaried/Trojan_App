@@ -11,7 +11,7 @@ def test(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
     return JsonResponse(response)
 
-def killInstance(request):
+def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
     instance_id = getCurrentInstanceID()
@@ -20,7 +20,7 @@ def killInstance(request):
     # Do a dryrun first to verify permissions
     try:
         ec2.stop_instances(InstanceIds=[instance_id], DryRun=True)
-    except Exception as e:
+    except UnauthorizedOperation as e:
         response['HTTPStatus'] = 'Unauthorized'
         response['HTTPStatusCode'] = '401'
         response['Message'] = 'Dry run failed'
@@ -30,7 +30,6 @@ def killInstance(request):
     try:
         results = ec2.stop_instances(InstanceIds=[instance_id], DryRun=False)
         response.update(results)
-
     except Exception as e:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
@@ -38,11 +37,12 @@ def killInstance(request):
 
     return JsonResponse(response)
 
-def getInstanceInfo(request):
+def instance_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
     instance_id = getCurrentInstanceID()
-    instance = getInstance(instance_id)
+    ec2 = boto3.resource('ec2')
+    instance = ec2.Instance(instance_id)
 
     try:
         response['instance_id'] = instance.instance_id
@@ -67,19 +67,7 @@ def getInstanceInfo(request):
 
     return JsonResponse(response)
 
-def getCloudWatchMetric(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
-
-    namespace = request.GET.get('namespace')
-    name = request.GET.get('name')
-
-    cloudwatch = boto3.resource('cloudwatch')
-    metric = cloudwatch.Metric(namespace,name)
-    response['subresources'] = metric.get_available_subresources()
-
-    return JsonResponse(response)
-
-def getCloudWatchMetricInfo(request):
+def cloudwatch_getMetric(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
     namespace = request.GET.get('namespace')
@@ -113,5 +101,19 @@ def getCloudWatchMetricInfo(request):
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+def cloudwatch(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+
+    client = boto3.client('cloudwatch')
+    client.list_metrics(
+        Dimensions=[
+            {
+                'Name':"InstanceId"
+            },
+        ]
+    )
 
     return JsonResponse(response)
