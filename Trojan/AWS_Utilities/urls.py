@@ -4,7 +4,7 @@ from django.urls import path
 
 urlpatterns = [
     path('', views.test, name='test'),
-    path('get_instance_info/', views.getInstanceInfo, name='getInstanceInfo'),
-    path('get_cloudwatch_metric/', views.getCloudWatchInfo, name='getCloudWatchInfo'),
-    path('kill_instance/', views.killInstance, name='killInstance'),
+    path('ec2/instance/info/', views.getInstanceInfo, name='getInstanceInfo'),
+    path('ec2/instance/kill/', views.killInstance, name='killInstance'),
+    path('cloudwatch/metric/info/', views.getCloudWatchMetricInfo, name='getCloudWatchMetricInfo'),
 ]

@@ -20,7 +20,7 @@ def killInstance(request):
     # Do a dryrun first to verify permissions
     try:
         ec2.stop_instances(InstanceIds=[instance_id], DryRun=True)
-    except ClientError as e:
+    except Exception as e:
         response['HTTPStatus'] = 'Unauthorized'
         response['HTTPStatusCode'] = '401'
         response['Message'] = 'Dry run failed'
@@ -30,7 +30,8 @@ def killInstance(request):
     try:
         results = ec2.stop_instances(InstanceIds=[instance_id], DryRun=False)
         response.update(results)
-    except ClientError as e:
+
+    except Exception as e:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
@@ -57,6 +58,7 @@ def getInstanceInfo(request):
         response['instance_tags'] = instance.tags
         response['instance_vpc_id'] = instance.vpc_id
         response['instance_launch_time'] = instance.launch_time
+
     except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
@@ -65,12 +67,11 @@ def getInstanceInfo(request):
 
     return JsonResponse(response)
 
-def getCloudWatchInfo(request):
+def getCloudWatchMetricInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
 
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
-    period = int(request.GET.get('period'))
 
     try:
         cloudwatch = boto3.resource('cloudwatch')
@@ -78,7 +79,8 @@ def getCloudWatchInfo(request):
 
         dimensions = metric.dimensions
         startTime = datetime(2018, 8, 31)
-        endTime = startTime + timedelta(hours=24)
+        endTime = startTime + timedelta(hours=3)
+        period = 30
 
         statistics = metric.get_statistics(
             Dimensions=dimensions,
@@ -93,6 +95,7 @@ def getCloudWatchInfo(request):
         response['metric_dimensions'] = dimensions
         response['metric_metric_name'] = metric.metric_name
         response['metric_statistics'] = statistics
+
     except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
