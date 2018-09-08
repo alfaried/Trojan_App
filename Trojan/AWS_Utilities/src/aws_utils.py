@@ -235,5 +235,5 @@ def getCredentials():
             return_dict = {}
             for line in file_output.readlines():
                 return_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
-
+    print(DEBUG)
     return {'State':'Development','Results':'Not Available'}
