@@ -90,7 +90,7 @@ def cloudwatch_getMetric(request,attempts=0):
 
         dimensions = metric.dimensions
         endTime = datetime.utcnow()
-        startTime = (endTime - timedelta(days=2))
+        startTime = (endTime - timedelta(days=7))
 
         statistics = metric.get_statistics(
             Dimensions=dimensions,
