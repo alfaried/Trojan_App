@@ -83,17 +83,24 @@ def cloudwatch_getMetric(request,attempts=0):
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
     period = request.GET.get('period')
+    endTime = datetime.utcnow()
+    startTime = (endTime - timedelta(days=2))
 
     try:
-        cloudwatch = boto3.resource('cloudwatch')
-        metric = cloudwatch.Metric(namespace,name)
+        client = boto3.client('cloudwatch', region_name='ap-southeast-1')
 
-        dimensions = metric.dimensions
-        endTime = datetime.utcnow()
-        startTime = (endTime - timedelta(days=2))
+        dimensions_name = 'InstanceId'
+        value = getInstanceID()
 
-        statistics = metric.get_statistics(
-            Dimensions=dimensions,
+        statistics = cloudwatch.get_metric_statistics(
+            Namespace=namespace,
+            MetricName=name,
+            Dimensions=[
+                {
+                    'Name':dimensions_name,
+                    'Value':value
+                },
+            ]
             StartTime=startTime.isoformat(),
             EndTime=endTime.isoformat(),
             Period=int(period),
@@ -122,16 +129,17 @@ def cloudwatch_getAvailableMetrics(request):
 
     namespace = request.GET.get('namespace')
 
-    value = getInstanceID()
     dimensions_name = 'InstanceId'
+    value = getInstanceID()
 
     if 'EBS' in namespace:
-        value = getVolumeID()
         dimensions_name = 'VolumeId'
+        value = getVolumeID()
+
     # to-do:
     # Configure to take in more parameters instead of just EC2 and EBS
 
-    client = boto3.client('cloudwatch')
+    client = boto3.client('cloudwatch', region_name='ap-southeast-1')
     results = client.list_metrics(
         Namespace=namespace,
         Dimensions=[
