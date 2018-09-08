@@ -14,6 +14,35 @@ def test(request):
 
 # Request:
 #
+def instance_start(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    instance_id = getInstanceID()
+    ec2 = boto3.client('ec2')
+
+    # Do a dryrun first to verify permissions
+    try:
+        ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'UnauthorizedOperation':
+            response['HTTPStatus'] = 'Unauthorized'
+            response['HTTPStatusCode'] = '401'
+            response['Message'] = 'Dry run failed'
+            response['Error'] = e.args[0]
+
+    # Dry run succeeded, call stop_instances without dryrun
+    try:
+        results = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
+        response.update(results)
+    except Exception as e:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
 def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
@@ -23,11 +52,12 @@ def instance_stop(request):
     # Do a dryrun first to verify permissions
     try:
         ec2.stop_instances(InstanceIds=[instance_id], DryRun=True)
-    except UnauthorizedOperation as e:
-        response['HTTPStatus'] = 'Unauthorized'
-        response['HTTPStatusCode'] = '401'
-        response['Message'] = 'Dry run failed'
-        response['Error'] = e.args[0]
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'UnauthorizedOperation':
+            response['HTTPStatus'] = 'Unauthorized'
+            response['HTTPStatusCode'] = '401'
+            response['Message'] = 'Dry run failed'
+            response['Error'] = e.args[0]
 
     # Dry run succeeded, call stop_instances without dryrun
     try:
