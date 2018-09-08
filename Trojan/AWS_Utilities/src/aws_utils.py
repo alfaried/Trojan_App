@@ -226,14 +226,16 @@ def getAllElasticIPs():
     return elastic_ips
 
 def getCredentials():
+    results = {'State':'Development','Results':'Not Available'}
+
     if not DEBUG:
         file_path = '/home/ec2-user/.aws/credentials'
 
         with open(file_path,'r') as file_output:
             file_output.readline()
 
-            return_dict = {}
+            results = {}
             for line in file_output.readlines():
-                return_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
-    print(DEBUG)
-    return {'State':'Development','Results':'Not Available'}
+                results.update({line.split('=')[0]:line.split('=')[1].strip()})
+
+    return results
