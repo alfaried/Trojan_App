@@ -7,12 +7,12 @@ from Trojan.settings import PUBLIC_IP
 from AWS_Utilities.src.aws_utils import *
 from botocore.exceptions import ClientError
 
-
 def test(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
     return JsonResponse(response)
 
 # Request:
+# - instance_id
 #
 def instance_start(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
@@ -46,6 +46,7 @@ def instance_start(request):
     return JsonResponse(response)
 
 # Request:
+# - instance_id
 #
 def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
@@ -97,6 +98,7 @@ def instance_getAll(request):
     return JsonResponse(response)
 
 # Request:
+# - instance_id
 #
 def instance_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
@@ -218,5 +220,15 @@ def loadbalancer_getAll(request):
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - loadbalancer_arn
+#
+def loadbalancer_getInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    loadbalancer_arn = request.GET.get('loadbalancer_arn')
 
     return JsonResponse(response)
