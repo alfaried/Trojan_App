@@ -125,6 +125,31 @@ def instance_getAll(request):
     return JsonResponse(response)
 
 # Request:
+#
+def instance_getCurentInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        instance_id = getInstanceID(
+
+        )
+        ec2 = boto3.client('ec2')
+        instances = ec2.describe_instances(
+            InstanceIds=[
+                instance_id,
+            ],
+        )
+        response.update(instances)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
 # - instance_id
 #
 def instance_getInfo(request):
@@ -134,10 +159,17 @@ def instance_getInfo(request):
 
     try:
         if instance_id == None:
-            instance_id = getInstanceID()
+            response['HTTPStatus'] = 'Bad request'
+            response['HTTPStatusCode'] = '400'
+            response['Message'] = 'Please specify instance_id'
+            return JsonResponse(response)
 
         ec2 = boto3.client('ec2')
-        instances = ec2.describe_instances()
+        instances = ec2.describe_instances(
+            InstanceIds=[
+                instance_id,
+            ],
+        )
         response.update(instances)
 
     except Exception as e:
@@ -202,7 +234,7 @@ def cloudwatch_getAvailableMetrics(request):
     if namespace == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please indicate a namespace (i.e. AWS/EC2)'
+        response['Message'] = 'Please indicate a namespace (i.e. AWS/EC2, AWS/ELB, AWS/EBS)'
         return JsonResponse(response)
 
     try:
@@ -252,9 +284,11 @@ def loadbalancer_getInfo(request):
     loadbalancer_name = request.GET.get('loadbalancer_name')
 
     try:
-        # If did not state loadbalancer id, system will just return the first available one
         if loadbalancer_name == None:
-            loadbalancer_name = getLoadBalancerNames()[0]
+            response['HTTPStatus'] = 'Bad request'
+            response['HTTPStatusCode'] = '400'
+            response['Message'] = 'Please specify loadbalancer_name'
+            return JsonResponse(response)
 
         client = boto3.client('elb')
         loadbalancers = client.describe_load_balancers(
@@ -299,9 +333,11 @@ def loadbalancerV2_getInfo(request):
     loadbalancer_arn = request.GET.get('loadbalancer_arn')
 
     try:
-        # If did not state loadbalancer id, system will just return the first available one
         if loadbalancer_arn == None:
-            loadbalancer_arn = getLoadBalancerIDs()[0]
+            response['HTTPStatus'] = 'Bad request'
+            response['HTTPStatusCode'] = '400'
+            response['Message'] = 'Please specify loadbalancer_arn'
+            return JsonResponse(response)
 
         client = boto3.client('elbv2')
         loadbalancers = client.describe_load_balancers(
@@ -313,6 +349,55 @@ def loadbalancerV2_getInfo(request):
 
     except Exception as e:
         # traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def volume_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        client = boto3.client('ec2')
+        volumes = client.describe_volumes()
+        response.update(volumes)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - volume_id
+#
+def volume_getInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    volume_id = request.GET.get('volume_id')
+
+    if volume_id == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify volume_id'
+        return JsonResponse(response)
+
+    try:
+        client = boto3.client('ec2')
+        volumes = client.describe_volumes(
+            VolumeIds=[
+                volume_id,
+            ],
+        )
+        response.update(volumes)
+
+    except Exception as e:
+        traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
