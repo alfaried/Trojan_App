@@ -72,6 +72,24 @@ def instance_stop(request):
 
 # Request:
 #
+def instance_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        ec2 = boto3.client('ec2')
+        instances = ec2.describe_instances()
+        response.update(instances)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
 def instance_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
@@ -164,6 +182,24 @@ def cloudwatch_getAvailableMetrics(request):
 
         response['metric_dimensions'] = [dimension]
         response.update(results)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def loadbalancer_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        client = boto3.client('elbv2')
+        loadbalancers = client.describe_load_balancers()
+        response.update(loadbalancers)
 
     except Exception as e:
         traceback.print_exc()
