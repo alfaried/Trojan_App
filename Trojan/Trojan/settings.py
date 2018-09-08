@@ -30,7 +30,7 @@ SECRET_KEY = 'u4s$_5t0n2cw*i-@eh4e)aygcw+_au#nts^9tt(@m81^m(sm0m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (sys.argv[1] == 'runserver')
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1',PUBLIC_IP]
+ALLOWED_HOSTS = ['localhost','127.0.0.1',PUBLIC_IP,'Trojan-ALB-1000519366.ap-southeast-1.elb.amazonaws.com']
 
 
 # Application definition
