@@ -1,9 +1,13 @@
 import boto3
 import requests
+from Trojan.settings import DEBUG
 
 def getInstanceID():
-    response = requests.get('http://169.254.169.254/latest/meta-data/instance-id')
-    instance_id = response.text
+    instance_id = 'i-0cb0d00c76e58046a'
+
+    if not DEBUG:
+        response = requests.get('http://169.254.169.254/latest/meta-data/instance-id')
+        instance_id = response.text
 
     return instance_id
 
