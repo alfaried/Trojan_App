@@ -109,7 +109,7 @@ def cloudwatch_getMetric(request,attempts=0):
             ],
         )
 
-        response['metric_dimensions'] = dimensions
+        # response['metric_dimensions'] = dimensions
         response['metric_metric_name'] = metric.metric_name
         response['metric_statistics'] = statistics
 
