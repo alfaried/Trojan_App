@@ -84,7 +84,7 @@ def cloudwatch_getMetric(request,attempts=0):
     name = request.GET.get('name')
     period = request.GET.get('period')
     endTime = datetime.utcnow()
-    startTime = (endTime - timedelta(days=2))
+    startTime = (endTime - timedelta(days=1))
 
     try:
         client = boto3.client('cloudwatch', region_name='ap-southeast-1')
