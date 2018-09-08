@@ -234,8 +234,8 @@ def getCredentials():
         with open(file_path,'r') as file_output:
             file_output.readline()
 
-            results = {}
+            results = {'State': 'Production'}
             for line in file_output.readlines():
-                results.update({line.split('=')[0]:line.split('=')[1].strip()})
+                results['Results'].update({line.split('=')[0]:line.split('=')[1].strip()})
 
     return results
