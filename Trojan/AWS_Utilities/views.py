@@ -133,8 +133,7 @@ def cloudwatch_getAvailableMetrics(request):
             Dimensions=[dimension],
         )
 
-        response['Namespace'] = namespace
-        response['Dimensions_Name'] = dimensions_name
+        response['metric_dimensions'] = [dimension]
         response.update(results)
 
     except Exception as e:
