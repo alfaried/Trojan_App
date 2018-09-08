@@ -12,6 +12,28 @@ def test(request):
     return JsonResponse(response)
 
 # Request:
+#
+def instance_dashboard(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        instances = getAllRunningInstance()
+        loadbalancers = getAllLoadBalancers()
+        loadbalancersV2 = getAllLoadBalancersV2()
+
+        response.update(instances)
+        response.update(loadbalancers)
+        response.update(loadbalancersV2)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
 # - instance_id
 #
 def instance_start(request):
@@ -20,7 +42,9 @@ def instance_start(request):
     instance_id = request.GET.get('instance_id')
 
     if instance_id == None:
-        instance_id = getInstanceID()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify an instance id'
 
     ec2 = boto3.client('ec2')
 
@@ -54,7 +78,9 @@ def instance_stop(request):
     instance_id = request.GET.get('instance_id')
 
     if instance_id == None:
-        instance_id = getInstanceID()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify an instance id'
 
     ec2 = boto3.client('ec2')
 
@@ -225,8 +251,9 @@ def loadbalancer_getInfo(request):
     loadbalancer_name = request.GET.get('loadbalancer_name')
 
     try:
+        # If did not state loadbalancer id, system will just return the first available one
         if loadbalancer_name == None:
-            loadbalancer_name = getLoadBalancerName()[0]
+            loadbalancer_name = getLoadBalancerNames()[0]
 
         client = boto3.client('elb')
         loadbalancers = client.describe_load_balancers(
@@ -271,8 +298,9 @@ def loadbalancerV2_getInfo(request):
     loadbalancer_arn = request.GET.get('loadbalancer_arn')
 
     try:
+        # If did not state loadbalancer id, system will just return the first available one
         if loadbalancer_arn == None:
-            loadbalancer_arn = getLoadBalancerID()[0]
+            loadbalancer_arn = getLoadBalancerIDs()[0]
 
         client = boto3.client('elbv2')
         loadbalancers = client.describe_load_balancers(

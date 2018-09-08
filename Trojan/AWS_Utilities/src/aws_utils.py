@@ -21,7 +21,7 @@ def getVolumeID():
 
     return volume_ids[0]
 
-def getLoadBalancerID(type=None):
+def getLoadBalancerIDs(type=None):
     client = boto3.client('elbv2')
     loadbalancers = client.describe_load_balancers()
 
@@ -39,7 +39,7 @@ def getLoadBalancerID(type=None):
 
     return loadbalancer_ids
 
-def getLoadBalancerName():
+def getLoadBalancerNames():
     client = boto3.client('elb')
     loadbalancers = client.describe_load_balancers()
 
@@ -70,6 +70,28 @@ def getDimension(namespace):
             value = tmp[1] + '/' + tmp[2] + '/' + tmp[3]
 
         else:
-            value = getLoadBalancerName()
+            dimensions_name = 'LoadBalancerName'
+            value = getLoadBalancerNames()[0]
 
     return {'Name':dimensions_name,'Value':value}
+
+def getAllRunningInstance():
+    instances = {}
+    client = boto3.client('ec2')
+    results = client.describe_instances()
+
+    return instances
+
+def getAllLoadBalancers():
+    loadbalancers = {}
+    client = boto3.client('elb')
+    loadbaresultslancers = client.describe_load_balancers()
+
+    return loadbalancers
+
+def getAllLoadBalancersV2():
+    loadbalancersV2 = {}
+    client = boto3.client('elbv2')
+    results = client.describe_load_balancers()
+    
+    return loadbalancersV2
