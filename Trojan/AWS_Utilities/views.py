@@ -185,6 +185,12 @@ def cloudwatch_getAvailableMetrics(request):
 
     namespace = request.GET.get('namespace')
 
+    if namespace == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['message'] = 'Please indicate a namespace (i.e. AWS/EC2)'
+        return JsonResponse(response)
+
     try:
         client = boto3.client('cloudwatch', region_name='ap-southeast-1')
         dimension = getDimension(namespace)
