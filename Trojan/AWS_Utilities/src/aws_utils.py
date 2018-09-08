@@ -21,15 +21,23 @@ def getVolumeID():
 
     return volume_ids[0]
 
-def getLoadBalancerID():
+def getLoadBalancerID(type=None):
     client = boto3.client('elbv2')
     loadbalancers = client.describe_load_balancers()
 
     if len(loadbalancers['LoadBalancers']) == 0:
         raise Exception('No load balancers configured')
 
-    loadbalancer_ids = [lb['LoadBalancerArn'] for lb in loadbalancers['LoadBalancers']]
-    return loadbalancer_ids[0]
+    loadbalancer_ids = []
+
+    if type == None:
+        loadbalancer_ids = [lb['LoadBalancerArn'] for lb in loadbalancers['LoadBalancers']]
+
+    for lb in loadbalancers['LoadBalancers']:
+        if lb['Type'] == type:
+            loadbalancer_ids.append(lb['LoadBalancerArn'])
+
+    return loadbalancer_ids
 
 def getLoadBalancerName():
     client = boto3.client('elb')
@@ -39,7 +47,7 @@ def getLoadBalancerName():
         raise Exception('No load balancers configured')
 
     loadbalancer_names = [lb['LoadBalancerName'] for lb in loadbalancers['LoadBalancerDescriptions']]
-    return loadbalancer_names[0]
+    return loadbalancer_names
 
 def getDimension(namespace):
     dimensions_name = 'InstanceId'
@@ -50,6 +58,18 @@ def getDimension(namespace):
         value = getVolumeID()
     elif 'ELB' in namespace:
         dimensions_name = 'LoadBalancer'
-        pass
+
+        if 'Application' in namespace:
+            lb_ids = getLoadBalancerID('application')[0]
+            tmp = lb_ids.split(':')[-1].split('/')
+            value = tmp[1] + '/' + tmp[2] + '/' + tmp[3]
+
+        elif 'Network' in namespace:
+            lb_ids = getLoadBalancerID('network')[0]
+            tmp = lb_ids.split(':')[-1].split('/')
+            value = tmp[1] + '/' + tmp[2] + '/' + tmp[3]
+
+        else:
+            value = getLoadBalancerName()
 
     return {'Name':dimensions_name,'Value':value}

@@ -109,22 +109,9 @@ def instance_getInfo(request):
         if instance_id == None:
             instance_id = getInstanceID()
 
-        ec2 = boto3.resource('ec2')
-        instance = ec2.Instance(instance_id)
-
-        response['instance_id'] = instance.instance_id
-        response['instance_public_ip'] = instance.public_ip_address
-        response['instance_public_dns_name'] = instance.public_dns_name
-        response['instance_private_ip_address'] = instance.private_ip_address
-        response['instance_private_dns_name'] = instance.private_dns_name
-        response['instance_type'] = instance.instance_type
-        response['instance_kernel_id'] = instance.kernel_id
-        response['instance_security_groups'] = instance.security_groups
-        response['instance_state'] = instance.state
-        response['instance_subnet_id'] = instance.subnet_id
-        response['instance_tags'] = instance.tags
-        response['instance_vpc_id'] = instance.vpc_id
-        response['instance_launch_time'] = instance.launch_time
+        ec2 = boto3.client('ec2')
+        instances = ec2.describe_instances()
+        response.update(instances)
 
     except Exception as e:
         traceback.print_exc()
@@ -188,11 +175,11 @@ def cloudwatch_getAvailableMetrics(request):
     if namespace == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['message'] = 'Please indicate a namespace (i.e. AWS/EC2)'
+        response['Message'] = 'Please indicate a namespace (i.e. AWS/EC2)'
         return JsonResponse(response)
 
     try:
-        client = boto3.client('cloudwatch', region_name='ap-southeast-1')
+        client = boto3.client('cloudwatch')
         dimension = getDimension(namespace)
 
         results = client.list_metrics(
@@ -239,7 +226,7 @@ def loadbalancer_getInfo(request):
 
     try:
         if loadbalancer_name == None:
-            loadbalancer_name = getLoadBalancerName()
+            loadbalancer_name = getLoadBalancerName()[0]
 
         client = boto3.client('elb')
         loadbalancers = client.describe_load_balancers(
@@ -285,7 +272,7 @@ def loadbalancerV2_getInfo(request):
 
     try:
         if loadbalancer_arn == None:
-            loadbalancer_arn = getLoadBalancerID()
+            loadbalancer_arn = getLoadBalancerID()[0]
 
         client = boto3.client('elbv2')
         loadbalancers = client.describe_load_balancers(
