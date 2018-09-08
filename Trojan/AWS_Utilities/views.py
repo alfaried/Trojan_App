@@ -17,13 +17,14 @@ def instance_dashboard(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
-        instances = getAllRunningInstance()
-        loadbalancers = getAllLoadBalancers()
-        loadbalancersV2 = getAllLoadBalancersV2()
+        response.update({'LoadBalancers':{}})
+        response.update({'Instances':{}})
+        response.update(getAllVolumes())
+        response.update(getAllElasticIPs())
 
-        response.update(instances)
-        response.update(loadbalancers)
-        response.update(loadbalancersV2)
+        response['Instances'].update(getAllInstances())
+        response['LoadBalancers'].update(getAllLoadBalancers())
+        response['LoadBalancers'].update(getAllLoadBalancersV2())
 
     except Exception as e:
         traceback.print_exc()

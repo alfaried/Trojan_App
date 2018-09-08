@@ -11,15 +11,16 @@ def getInstanceID():
 
     return instance_id
 
-def getVolumeID():
-    instance_id = getInstanceID()
+def getVolumeIDs(instance_id=None):
+    if instance_id == None:
+        instance_id = getInstanceID()
 
     ec2 = boto3.resource('ec2')
     instance = ec2.Instance(instance_id)
     volume_iterator = instance.volumes.all()
     volume_ids = [v.id for v in volume_iterator]
 
-    return volume_ids[0]
+    return volume_ids
 
 def getLoadBalancerIDs(type=None):
     client = boto3.client('elbv2')
@@ -55,7 +56,7 @@ def getDimension(namespace):
 
     if 'EBS' in namespace:
         dimensions_name = 'VolumeId'
-        value = getVolumeID()
+        value = getVolumeIDs()[0]
     elif 'ELB' in namespace:
         dimensions_name = 'LoadBalancer'
 
@@ -75,23 +76,151 @@ def getDimension(namespace):
 
     return {'Name':dimensions_name,'Value':value}
 
-def getAllRunningInstance():
-    instances = {}
+def getAllInstances():
+    instances = {'Active':{},'Non-Active':{}}
     client = boto3.client('ec2')
     results = client.describe_instances()
+
+    active_instance_count = 0
+    non_active_instance_count = 0
+
+    active_instance_list = []
+    non_active_instance_list = []
+
+    for instance in results['Reservations']:
+        for i in instance['Instances']:
+            if i['State']['Name'] == 'running':
+                active_instance_count += 1
+                active_instance_list.append(
+                    {
+                        'Instance_ID':i['InstanceId'],
+                        'ImageId':i['ImageId'],
+                        'Volume_IDs':getVolumeIDs(i['InstanceId']),
+                        'PublicIpAddress':i['PublicIpAddress'],
+                        'PublicDnsName':i['PublicDnsName'],
+                    }
+                )
+            elif not i['State']['Name'] == 'terminated':
+                non_active_instance_count += 1
+                non_active_instance_list.append(
+                    {
+                        'Instance_ID':i['InstanceId'],
+                        'ImageId':i['ImageId'],
+                        'Volume_IDs':getVolumeIDs(i['InstanceId']),
+                        'PublicIpAddress':i['PublicIpAddress'],
+                        'PublicDnsName':i['PublicDnsName'],
+                    }
+                )
+
+    instances['Active'].update({'Count':active_instance_count,'Details':active_instance_list})
+    instances['Non-Active'].update({'Count':non_active_instance_count,'Details':non_active_instance_list})
 
     return instances
 
 def getAllLoadBalancers():
-    loadbalancers = {}
+    loadbalancers = {'Classic_ELB':{}}
     client = boto3.client('elb')
-    loadbaresultslancers = client.describe_load_balancers()
+    results = client.describe_load_balancers()
+
+    celb_count = 0
+    celb_list = []
+
+    for lb in results['LoadBalancerDescriptions']:
+        celb_count += 1
+        celb_list.append(
+            {
+                'LoadBalancerName':lb['LoadBalancerName'],
+                'DNSName':lb['DNSName'],
+            }
+        )
+
+    loadbalancers['Classic_ELB'].update({'Count':celb_count,'Detials':celb_list})
 
     return loadbalancers
 
 def getAllLoadBalancersV2():
-    loadbalancersV2 = {}
+    loadbalancersV2 = {'Application_ELB':{},'Network_ELB':{}}
     client = boto3.client('elbv2')
     results = client.describe_load_balancers()
-    
+
+    aelb_count = 0
+    nelb_count = 0
+
+    aelb_list = []
+    nelb_list = []
+
+    for lb in results['LoadBalancers']:
+        if lb['Type'] == 'application':
+            aelb_count += 1
+            aelb_list.append(
+                {
+                    'LoadBalancerArn':lb['LoadBalancerArn'],
+                    'LoadBalancerName':lb['LoadBalancerName'],
+                    'DNSName':lb['DNSName'],
+                }
+            )
+        if lb['Type'] == 'network':
+            nelb_count += 1
+            nelb_list.append(
+                {
+                    'LoadBalancerArn':lb['LoadBalancerArn'],
+                    'LoadBalancerName':lb['LoadBalancerName'],
+                    'DNSName':lb['DNSName'],
+                }
+            )
+
+    loadbalancersV2['Application_ELB'].update({'Count':aelb_count,'Details':aelb_list})
+    loadbalancersV2['Network_ELB'].update({'Count':nelb_count,'Details':nelb_list})
+
     return loadbalancersV2
+
+def getAllVolumes():
+    volumes = {'Volumes':{}}
+
+    count = 0
+    list = []
+
+    client = boto3.client('ec2')
+    results = client.describe_volumes()
+
+    for volume in results['Volumes']:
+        count += 1
+
+        instance_list = []
+        for attachment in volume['Attachments']:
+            instance_list.append(attachment['InstanceId'])
+
+        list.append(
+            {
+                'VolumeID':volume['VolumeId'],
+                'Size':volume['Size'],
+                'Attachements':instance_list
+            }
+        )
+
+    volumes['Volumes'].update({'Count':count,'Details':list})
+
+    return volumes
+
+def getAllElasticIPs():
+    elastic_ips = {'Elastic_IPs':{}}
+
+    count = 0
+    list = []
+
+    client = boto3.client('ec2')
+    results = client.describe_addresses()
+
+    for ips in results['Addresses']:
+        count += 1
+        list.append(
+            {
+                'InstanceId':ips['InstanceId'],
+                'PublicIp':ips['PublicIp'],
+                'Domain':ips['Domain'],
+            }
+        )
+
+    elastic_ips['Elastic_IPs'].update({'Count':count,'Details':list})
+
+    return elastic_ips
