@@ -125,7 +125,6 @@ def cloudwatch_getAvailableMetrics(request):
 
     try:
         client = boto3.client('cloudwatch', region_name='ap-southeast-1')
-
         dimension = getDimension(namespace)
 
         results = client.list_metrics(
