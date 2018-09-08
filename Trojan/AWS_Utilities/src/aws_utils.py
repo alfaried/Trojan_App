@@ -17,8 +17,6 @@ def getVolumeID():
 
     return volume_ids[0]
 
-# to-do:
-# Configure to take in more parameters instead of just EC2 and EBS
 def getDimension(namespace):
     dimensions_name = 'InstanceId'
     value = getInstanceID()
@@ -26,5 +24,8 @@ def getDimension(namespace):
     if 'EBS' in namespace:
         dimensions_name = 'VolumeId'
         value = getVolumeID()
+    elif 'ELB' in namespace:
+        dimensions_name = 'LoadBalancer'
+        pass
 
     return {'Name':dimensions_name,'Value':value}
