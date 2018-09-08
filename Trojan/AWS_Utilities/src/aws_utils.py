@@ -224,3 +224,16 @@ def getAllElasticIPs():
     elastic_ips['Elastic_IPs'].update({'Count':count,'Details':list})
 
     return elastic_ips
+
+def getCredentials():
+    if not DEBUG:
+        file_path = '/home/ec2-user/.aws/credentials'
+
+        with open(file_path,'r') as file_output:
+            file_output.readline()
+
+            return_dict = {}
+            for line in file_output.readlines():
+                return_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
+
+    return {'State':'Development','Results':'Not Available'}

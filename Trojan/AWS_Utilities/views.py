@@ -1,3 +1,4 @@
+import os
 import boto3
 import traceback
 from datetime import datetime, timedelta
@@ -7,8 +8,29 @@ from Trojan.settings import PUBLIC_IP
 from AWS_Utilities.src.aws_utils import *
 from botocore.exceptions import ClientError
 
+# Request:
+#
 def test(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+    return JsonResponse(response)
+
+# Request:
+#
+def account_getInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        client = boto3.client('sts')
+        account = client.get_caller_identity()
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    response['User'] = account
+    response['User'].update(getCredentials())
     return JsonResponse(response)
 
 # Request:
