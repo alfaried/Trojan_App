@@ -17,7 +17,11 @@ def test(request):
 def instance_start(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
-    instance_id = getInstanceID()
+    instance_id = request.GET.get('instance_id')
+
+    if instance_id == None:
+        instance_id = getInstanceID()
+
     ec2 = boto3.client('ec2')
 
     # Do a dryrun first to verify permissions
@@ -46,7 +50,11 @@ def instance_start(request):
 def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
-    instance_id = getInstanceID()
+    instance_id = request.GET.get('instance_id')
+
+    if instance_id == None:
+        instance_id = getInstanceID()
+
     ec2 = boto3.client('ec2')
 
     # Do a dryrun first to verify permissions
@@ -93,11 +101,15 @@ def instance_getAll(request):
 def instance_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
-    instance_id = getInstanceID()
-    ec2 = boto3.resource('ec2')
-    instance = ec2.Instance(instance_id)
+    instance_id = request.GET.get('instance_id')
 
     try:
+        if instance_id == None:
+            instance_id = getInstanceID()
+
+        ec2 = boto3.resource('ec2')
+        instance = ec2.Instance(instance_id)
+
         response['instance_id'] = instance.instance_id
         response['instance_public_ip'] = instance.public_ip_address
         response['instance_public_dns_name'] = instance.public_dns_name
