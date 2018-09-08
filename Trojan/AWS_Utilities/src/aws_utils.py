@@ -16,3 +16,15 @@ def getVolumeID():
     volume_ids = [v.id for v in volume_iterator]
 
     return volume_ids[0]
+
+# to-do:
+# Configure to take in more parameters instead of just EC2 and EBS
+def getDimension(namespace):
+    dimensions_name = 'InstanceId'
+    value = getInstanceID()
+
+    if 'EBS' in namespace:
+        dimensions_name = 'VolumeId'
+        value = getVolumeID()
+
+    return {'Name':dimensions_name,'Value':value}

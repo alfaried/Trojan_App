@@ -83,24 +83,18 @@ def cloudwatch_getMetric(request,attempts=0):
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
     period = request.GET.get('period')
-    endTime = datetime.utcnow()
-    startTime = (endTime - timedelta(days=1))
 
     try:
         client = boto3.client('cloudwatch', region_name='ap-southeast-1')
 
-        dimensions_name = 'InstanceId'
-        value = getInstanceID()
+        endTime = datetime.utcnow()
+        startTime = (endTime - timedelta(days=1))
+        dimension = getDimension(namespace)
 
         statistics = client.get_metric_statistics(
             Namespace=namespace,
             MetricName=name,
-            Dimensions=[
-                {
-                    'Name':dimensions_name,
-                    'Value':value
-                },
-            ],
+            Dimensions=[dimension],
             StartTime=startTime.isoformat(),
             EndTime=endTime.isoformat(),
             Period=int(period),
@@ -109,7 +103,7 @@ def cloudwatch_getMetric(request,attempts=0):
             ],
         )
 
-        response['metric_dimensions'] = {'Name':dimensions_name,'Value':value}
+        response['metric_dimensions'] = [dimension]
         response['metric_metric_name'] = name
         response['metric_statistics'] = statistics
 
@@ -129,29 +123,24 @@ def cloudwatch_getAvailableMetrics(request):
 
     namespace = request.GET.get('namespace')
 
-    dimensions_name = 'InstanceId'
-    value = getInstanceID()
+    try:
+        client = boto3.client('cloudwatch', region_name='ap-southeast-1')
 
-    if 'EBS' in namespace:
-        dimensions_name = 'VolumeId'
-        value = getVolumeID()
+        dimension = getDimension(namespace)
 
-    # to-do:
-    # Configure to take in more parameters instead of just EC2 and EBS
+        results = client.list_metrics(
+            Namespace=namespace,
+            Dimensions=[dimension],
+        )
 
-    client = boto3.client('cloudwatch', region_name='ap-southeast-1')
-    results = client.list_metrics(
-        Namespace=namespace,
-        Dimensions=[
-            {
-                'Name':dimensions_name,
-                'Value':value
-            },
-        ],
-    )
+        response['Namespace'] = namespace
+        response['Dimensions_Name'] = dimensions_name
+        response.update(results)
 
-    response['Namespace'] = namespace
-    response['Dimensions_Name'] = dimensions_name
-    response.update(results)
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
 
     return JsonResponse(response)
