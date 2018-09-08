@@ -100,7 +100,7 @@ def cloudwatch_getMetric(request,attempts=0):
                     'Name':dimensions_name,
                     'Value':value
                 },
-            ]
+            ],
             StartTime=startTime.isoformat(),
             EndTime=endTime.isoformat(),
             Period=int(period),
