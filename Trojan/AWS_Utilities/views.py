@@ -105,7 +105,6 @@ def cloudwatch_getMetric(request,attempts=0):
         response['metric_dimensions'] = dimensions
         response['metric_metric_name'] = metric.metric_name
 
-        statistics['ResponseMetaData']['RetryAttempts'] = attempts
         if len(statistics['Datapoints']) == 0:
             attempts += 1
             return cloudwatch_getMetric(request,attempts)
