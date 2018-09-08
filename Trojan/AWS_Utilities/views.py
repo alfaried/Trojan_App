@@ -89,7 +89,7 @@ def cloudwatch_getMetric(request,attempts=0):
         metric = cloudwatch.Metric(namespace,name)
 
         dimensions = metric.dimensions
-        endTime = datetime.now()
+        endTime = datetime.utcnow()
         startTime = (endTime - timedelta(days=1))
 
         statistics = metric.get_statistics(
@@ -105,7 +105,6 @@ def cloudwatch_getMetric(request,attempts=0):
         response['metric_dimensions'] = dimensions
         response['metric_metric_name'] = metric.metric_name
 
-        # statistics['ResponseMetaData']['RetryAttempts'] = attempts
         if len(statistics['Datapoints']) == 0 and attempts <= 10:
             attempts += 1
             return cloudwatch_getMetric(request,attempts)
