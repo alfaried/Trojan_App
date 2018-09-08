@@ -9,13 +9,13 @@ from botocore.exceptions import ClientError
 
 
 def test(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
     return JsonResponse(response)
 
 # Request:
 #
 def instance_stop(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     instance_id = getInstanceID()
     ec2 = boto3.client('ec2')
@@ -43,7 +43,7 @@ def instance_stop(request):
 # Request:
 #
 def instance_getInfo(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     instance_id = getInstanceID()
     ec2 = boto3.resource('ec2')
@@ -77,8 +77,8 @@ def instance_getInfo(request):
 # - name
 # - period
 #
-def cloudwatch_getMetric(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+def cloudwatch_getMetric(request,attempts=0):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     namespace = request.GET.get('namespace')
     name = request.GET.get('name')
@@ -104,6 +104,8 @@ def cloudwatch_getMetric(request):
 
         response['metric_dimensions'] = dimensions
         response['metric_metric_name'] = metric.metric_name
+
+        statistics['ResponseMetaData']['RetryAttempts'] = attempts
         response['metric_statistics'] = statistics
 
     except Exception as e:
@@ -112,13 +114,17 @@ def cloudwatch_getMetric(request):
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
 
+    if len(response['metric_statistics']['Datapoints']) == 0:
+        attempts += 1
+        return cloudwatch_getMetric(request,attempts)
+
     return JsonResponse(response)
 
 # Request:
 # - namespace
 #
 def cloudwatch_getAvailableMetrics(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':'200'}
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     namespace = request.GET.get('namespace')
 
