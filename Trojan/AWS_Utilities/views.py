@@ -92,7 +92,7 @@ def cloudwatch_getMetric(request,attempts=0):
         dimensions_name = 'InstanceId'
         value = getInstanceID()
 
-        statistics = cloudwatch.get_metric_statistics(
+        statistics = client.get_metric_statistics(
             Namespace=namespace,
             MetricName=name,
             Dimensions=[
