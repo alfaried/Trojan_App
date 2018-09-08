@@ -21,6 +21,26 @@ def getVolumeID():
 
     return volume_ids[0]
 
+def getLoadBalancerID():
+    client = boto3.client('elbv2')
+    loadbalancers = client.describe_load_balancers()
+
+    if len(loadbalancers['LoadBalancers']) == 0:
+        raise Exception('No load balancers configured')
+
+    loadbalancer_ids = [lb['LoadBalancerArn'] for lb in loadbalancers['LoadBalancers']]
+    return loadbalancer_ids[0]
+
+def getLoadBalancerName():
+    client = boto3.client('elb')
+    loadbalancers = client.describe_load_balancers()
+
+    if len(loadbalancers['LoadBalancerDescriptions']) == 0:
+        raise Exception('No load balancers configured')
+
+    loadbalancer_names = [lb['LoadBalancerName'] for lb in loadbalancers['LoadBalancerDescriptions']]
+    return loadbalancer_names[0]
+
 def getDimension(namespace):
     dimensions_name = 'InstanceId'
     value = getInstanceID()

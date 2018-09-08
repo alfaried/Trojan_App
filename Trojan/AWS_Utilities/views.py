@@ -217,6 +217,52 @@ def loadbalancer_getAll(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
+        client = boto3.client('elb')
+        loadbalancers = client.describe_load_balancers()
+        response.update(loadbalancers)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - loadbalancer_name
+#
+def loadbalancer_getInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    loadbalancer_name = request.GET.get('loadbalancer_name')
+
+    try:
+        if loadbalancer_name == None:
+            loadbalancer_name = getLoadBalancerName()
+
+        client = boto3.client('elb')
+        loadbalancers = client.describe_load_balancers(
+            LoadBalancerNames=[
+                loadbalancer_name,
+            ],
+        )
+        response.update(loadbalancers)
+
+    except Exception as e:
+        # traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def loadbalancerV2_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
         client = boto3.client('elbv2')
         loadbalancers = client.describe_load_balancers()
         response.update(loadbalancers)
@@ -232,9 +278,27 @@ def loadbalancer_getAll(request):
 # Request:
 # - loadbalancer_arn
 #
-def loadbalancer_getInfo(request):
+def loadbalancerV2_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     loadbalancer_arn = request.GET.get('loadbalancer_arn')
+
+    try:
+        if loadbalancer_arn == None:
+            loadbalancer_arn = getLoadBalancerID()
+
+        client = boto3.client('elbv2')
+        loadbalancers = client.describe_load_balancers(
+            LoadBalancerArns=[
+                loadbalancer_arn,
+            ],
+        )
+        response.update(loadbalancers)
+
+    except Exception as e:
+        # traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
 
     return JsonResponse(response)

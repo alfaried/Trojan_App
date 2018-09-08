@@ -10,6 +10,8 @@ urlpatterns = [
     path('ec2/instance/list/', views.instance_getAll, name='instance_getAll'),
     path('cloudwatch/metric/info/', views.cloudwatch_getMetric, name='cloudwatch_getMetric'),
     path('cloudwatch/metric/list/', views.cloudwatch_getAvailableMetrics, name='cloudwatch_getAvailableMetrics'),
+    path('elbv2/list/', views.loadbalancerV2_getAll, name='loadbalancerV2_getAll'),
+    path('elbv2/info/', views.loadbalancerV2_getInfo, name='loadbalancerV2_getInfo'),
     path('elb/list/', views.loadbalancer_getAll, name='loadbalancer_getAll'),
     path('elb/info/', views.loadbalancer_getInfo, name='loadbalancer_getInfo'),
 ]
