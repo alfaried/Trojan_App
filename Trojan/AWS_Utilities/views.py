@@ -106,6 +106,10 @@ def cloudwatch_getMetric(request,attempts=0):
         response['metric_metric_name'] = metric.metric_name
 
         statistics['ResponseMetaData']['RetryAttempts'] = attempts
+        if len(statistics['Datapoints']) == 0:
+            attempts += 1
+            return cloudwatch_getMetric(request,attempts)
+
         response['metric_statistics'] = statistics
 
     except Exception as e:
@@ -113,10 +117,6 @@ def cloudwatch_getMetric(request,attempts=0):
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
-
-    if len(response['metric_statistics']['Datapoints']) == 0:
-        attempts += 1
-        return cloudwatch_getMetric(request,attempts)
 
     return JsonResponse(response)
 
