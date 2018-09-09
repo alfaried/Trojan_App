@@ -208,6 +208,15 @@ def instance_stop(request):
 
     return JsonResponse(response)
 
+# TO-DO
+# Request:
+# - instance_id
+# - secret_key
+#
+def instance_overload(erquest):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+    return JsonResponse(response)
+
 # Request:
 #
 def instance_getAll(request):
@@ -517,9 +526,16 @@ def volume_getInfo(request):
 def snapshot_getAll(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
+    owner_id = getOwnerID()
+
     try:
         client = boto3.client('ec2')
-        response.update(client.describe_snapshots())
+        snapshots = client.describe_snapshots(
+            OwnerIds=[
+                owner_id,
+            ],
+        )
+        response.update(snapshots)
 
     except Exception as e:
         traceback.print_exc()
@@ -535,6 +551,8 @@ def snapshot_getAll(request):
 def snapshot_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
+    owner_id = getOwnerID()
+
     snapshot_id = request.GET.get('snapshot_id')
     if snapshot_id == None:
         response['HTTPStatus'] = 'Bad request'
@@ -546,6 +564,9 @@ def snapshot_getInfo(request):
         client = boto3.client('ec2')
         response.update(
             client.describe_snapshots(
+                OwnerIds=[
+                    owner_id,
+                ],
                 SnapshotIds=[
                     snapshot_id,
                 ]
@@ -565,9 +586,16 @@ def snapshot_getInfo(request):
 def image_getAll(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
+    owner_id = getOwnerID()
+
     try:
         client = boto3.client('ec2')
-        response.update(client.describe_images())
+        images = client.describe_images(
+            Owners=[
+                owner_id,
+            ],
+        )
+        response.update(images)
 
     except Exception as e:
         traceback.print_exc()
@@ -583,6 +611,8 @@ def image_getAll(request):
 def image_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
+    owner_id = getOwnerID()
+
     image_id = request.GET.get('image_id')
     if image_id == None:
         response['HTTPStatus'] = 'Bad request'
@@ -594,6 +624,9 @@ def image_getInfo(request):
         client = boto3.client('ec2')
         response.update(
             client.describe_images(
+                Owners=[
+                    owner_id,
+                ],
                 ImageIds=[
                     image_id,
                 ]

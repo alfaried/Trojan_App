@@ -25,6 +25,12 @@ def validate(secret_key):
 
     return True,response
 
+def getOwnerID():
+    client = boto3.client('sts')
+    account = client.get_caller_identity()
+
+    return account['Account']
+
 def getInstanceID():
     instance_id = 'i-0cb0d00c76e58046a'
 
@@ -249,13 +255,19 @@ def getAllElasticIPs():
     return elastic_ips
 
 def getAllSnapshots():
-    snapshots = {'Snapshots_IDs':{}}
+    snapshots = {'Snapshots':{}}
+
+    owner_id = getOwnerID()
 
     snapshots_count = 0
     snapshots_list = []
 
     client = boto3.client('ec2')
-    results = client.describe_snapshots()
+    results = client.describe_snapshots(
+        OwnerIds=[
+            owner_id,
+        ],
+    )
 
     for snapshot in results['Snapshots']:
         snapshots_count += 1
@@ -268,18 +280,24 @@ def getAllSnapshots():
             }
         )
 
-    snapshots['Snapshots_IDs'].update({'Count':snapshots_count,'Details':snapshots_list})
+    snapshots['Snapshots'].update({'Count':snapshots_count,'Details':snapshots_list})
 
     return snapshots
 
 def getAllImages():
-    images = {'Image_IDs':{}}
+    images = {'Images':{}}
+
+    owner_id = getOwnerID()
 
     images_count = 0
     images_list = []
 
     client = boto3.client('ec2')
-    results = client.describe_images()
+    results = client.describe_images(
+        Owners=[
+            owner_id,
+        ],
+    )
 
     for image in results['Images']:
         images_count += 1
@@ -294,7 +312,7 @@ def getAllImages():
             }
         )
 
-    images['Image_IDs'].update({'Count':images_count,'Details':images_list})
+    images['Images'].update({'Count':images_count,'Details':images_list})
 
     return images
 

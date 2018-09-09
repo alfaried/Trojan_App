@@ -19,6 +19,7 @@ urlpatterns = [
     path('ec2/image/get/', views.image_getInfo, name='image_getInfo'),
     path('ec2/instance/event/stop/', views.instance_stop, name='instance_stop'),
     path('ec2/instance/event/start/', views.instance_start, name='instance_start'),
+    path('ec2/instance/event/overload/', views.instance_overload, name='instance_overload'),
     path('cloudwatch/metric/list/', views.cloudwatch_getAvailableMetrics, name='cloudwatch_getAvailableMetrics'),
     path('cloudwatch/metric/get/', views.cloudwatch_getMetric, name='cloudwatch_getMetric'),
     path('elbv2/list/', views.loadbalancerV2_getAll, name='loadbalancerV2_getAll'),
