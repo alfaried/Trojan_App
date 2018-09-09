@@ -4,8 +4,8 @@ import traceback
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
-from Trojan.settings import PUBLIC_IP, ACCOUNT_SECRET_KEY
-from AWS_Utilities.src.aws_utils import *
+from Trojan.settings import PUBLIC_IP
+from AWS_Utilities.src.utilities import *
 from botocore.exceptions import ClientError
 
 # Request:
@@ -21,16 +21,9 @@ def account_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200, 'User':{}}
 
     secret_key = request.GET.get('secret_key')
-    if secret_key == None:
-        response['HTTPStatus'] = 'Bad request'
-        response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please specify a secret_key to access information'
-        return JsonResponse(response)
+    status,response = validate(secret_key)
 
-    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
-        response['HTTPStatus'] = 'Unauthorized'
-        response['HTTPStatusCode'] = '401'
-        response['Message'] = 'Please enter a valid secret_key'
+    if not status:
         return JsonResponse(response)
 
     try:
@@ -51,33 +44,26 @@ def account_getInfo(request):
     return JsonResponse(response)
 
 # Request:
-# - secrete_key
+# - secret_key
 # - public_key
 #
 def account_addPublicKey(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     public_key = request.GET.get('public_key')
-    secret_key = request.GET.get('secret_key')
-    if secret_key == None:
+    if public_key == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please specify a secret_key to access information'
+        response['Message'] = 'Please specify a public_key'
         return JsonResponse(response)
 
-    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
-        response['HTTPStatus'] = 'Unauthorized'
-        response['HTTPStatusCode'] = '401'
-        response['Message'] = 'Please enter a valid secret_key'
+    secret_key = request.GET.get('secret_key')
+    status,response = validate(secret_key)
+
+    if not status:
         return JsonResponse(response)
 
     try:
-        if public_key == None:
-            response['HTTPStatus'] = 'Bad request'
-            response['HTTPStatusCode'] = '400'
-            response['Message'] = 'Please specify an public_key'
-            return JsonResponse(response)
-
         response.update(addPublicKey(public_key))
 
     except Exception as e:
@@ -89,22 +75,15 @@ def account_addPublicKey(request):
     return JsonResponse(response)
 
 # Request:
-# - secrete_key
+# - secret_key
 #
 def account_getPublicKeys(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     secret_key = request.GET.get('secret_key')
-    if secret_key == None:
-        response['HTTPStatus'] = 'Bad request'
-        response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please specify a secret_key to access information'
-        return JsonResponse(response)
-        
-    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
-        response['HTTPStatus'] = 'Unauthorized'
-        response['HTTPStatusCode'] = '401'
-        response['Message'] = 'Please enter a valid secret_key'
+    status,response = validate(secret_key)
+
+    if not status:
         return JsonResponse(response)
 
     try:
@@ -143,16 +122,22 @@ def instance_dashboard(request):
 
 # Request:
 # - instance_id
+# - secret_key
 #
 def instance_start(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     instance_id = request.GET.get('instance_id')
-
     if instance_id == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Message'] = 'Please specify an instance_id'
+        return JsonResponse(response)
+
+    secret_key = request.GET.get('secret_key')
+    status,response = validate(secret_key)
+
+    if not status:
         return JsonResponse(response)
 
     ec2 = boto3.client('ec2')
@@ -180,16 +165,22 @@ def instance_start(request):
 
 # Request:
 # - instance_id
+# - secret_key
 #
 def instance_stop(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     instance_id = request.GET.get('instance_id')
-
     if instance_id == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
         response['Message'] = 'Please specify an instance_id'
+        return JsonResponse(response)
+
+    secret_key = request.GET.get('secret_key')
+    status,response = validate(secret_key)
+
+    if not status:
         return JsonResponse(response)
 
     ec2 = boto3.client('ec2')

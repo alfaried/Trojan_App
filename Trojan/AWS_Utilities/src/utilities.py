@@ -1,7 +1,7 @@
 import boto3
 import hashlib
 import requests
-from Trojan.settings import DEBUG
+from Trojan.settings import DEBUG, ACCOUNT_SECRET_KEY
 
 def getInstanceID():
     instance_id = 'i-0cb0d00c76e58046a'
@@ -286,3 +286,20 @@ def hashPlainText(plaintext):
     plaintext_byte = plaintext.encode('utf-8')
     hashedtext = hashlib.sha256(plaintext_byte).hexdigest()
     return hashedtext
+
+def validate(secret_key):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    if secret_key == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a secret_key to access information'
+        return False,response
+
+    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
+        response['HTTPStatus'] = 'Unauthorized'
+        response['HTTPStatusCode'] = '401'
+        response['Message'] = 'Please enter a valid secret_key'
+        return False,response
+
+    return True,response
