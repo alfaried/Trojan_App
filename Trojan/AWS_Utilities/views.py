@@ -107,6 +107,8 @@ def instance_dashboard(request):
         response.update({'Instances':{}})
         response.update(getAllVolumes())
         response.update(getAllElasticIPs())
+        response.update(getAllSnapshots())
+        response.update(getAllImages())
 
         response['Instances'].update(getAllInstances())
         response['LoadBalancers'].update(getAllLoadBalancers())
