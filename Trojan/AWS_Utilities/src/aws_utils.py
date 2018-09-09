@@ -1,4 +1,5 @@
 import boto3
+import hashlib
 import requests
 from Trojan.settings import DEBUG
 
@@ -280,3 +281,8 @@ def addPublicKey(public_key=None):
         results = {'State':'Production','Status':'Successful'}
 
     return results
+
+def hashPlainText(plaintext):
+    plaintext_byte = plaintext.encode('utf-8')
+    hashedtext = hashlib.sha256(plaintext_byte).hexdigest()
+    return hashedtext

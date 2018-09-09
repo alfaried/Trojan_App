@@ -4,7 +4,7 @@ import traceback
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
-from Trojan.settings import PUBLIC_IP
+from Trojan.settings import PUBLIC_IP, ACCOUNT_SECRET_KEY
 from AWS_Utilities.src.aws_utils import *
 from botocore.exceptions import ClientError
 
@@ -15,13 +15,31 @@ def test(request):
     return JsonResponse(response)
 
 # Request:
+# - secret_key
 #
 def account_getInfo(request):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200, 'User':{}}
+
+    secret_key = request.GET.get('secret_key')
+    if secret_key == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a secret_key to access information'
+        return JsonResponse(response)
+
+    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
+        response['HTTPStatus'] = 'Unauthorized'
+        response['HTTPStatusCode'] = '401'
+        response['Message'] = 'Please enter a valid secret_key'
+        return JsonResponse(response)
 
     try:
         client = boto3.client('sts')
         account = client.get_caller_identity()
+
+        response['User'].update({'Account':account['Account']})
+        response['User'].update({'Arn':account['Arn']})
+        response['User'].update({'UserId':account['UserId']})
 
     except Exception as e:
         traceback.print_exc()
@@ -29,17 +47,29 @@ def account_getInfo(request):
         response['HTTPStatusCode'] = '400'
         response['Error'] = e.args[0]
 
-    response['User'] = account
     response['User'].update(getCredentials())
     return JsonResponse(response)
 
 # Request:
+# - secrete_key
 # - public_key
 #
 def account_addPublicKey(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     public_key = request.GET.get('public_key')
+    secret_key = request.GET.get('secret_key')
+    if secret_key == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a secret_key to access information'
+        return JsonResponse(response)
+
+    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
+        response['HTTPStatus'] = 'Unauthorized'
+        response['HTTPStatusCode'] = '401'
+        response['Message'] = 'Please enter a valid secret_key'
+        return JsonResponse(response)
 
     try:
         if public_key == None:
@@ -59,9 +89,23 @@ def account_addPublicKey(request):
     return JsonResponse(response)
 
 # Request:
+# - secrete_key
 #
 def account_getPublicKeys(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    secret_key = request.GET.get('secret_key')
+    if secret_key == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a secret_key to access information'
+        return JsonResponse(response)
+        
+    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
+        response['HTTPStatus'] = 'Unauthorized'
+        response['HTTPStatusCode'] = '401'
+        response['Message'] = 'Please enter a valid secret_key'
+        return JsonResponse(response)
 
     try:
         response.update(getPublicKey())
