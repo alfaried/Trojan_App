@@ -3,6 +3,28 @@ import hashlib
 import requests
 from Trojan.settings import DEBUG, ACCOUNT_SECRET_KEY
 
+def hashPlainText(plaintext):
+    plaintext_byte = plaintext.encode('utf-8')
+    hashedtext = hashlib.sha256(plaintext_byte).hexdigest()
+    return hashedtext
+
+def validate(secret_key):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    if secret_key == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a secret_key to access information'
+        return False,response
+
+    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
+        response['HTTPStatus'] = 'Unauthorized'
+        response['HTTPStatusCode'] = '401'
+        response['Message'] = 'Please enter a valid secret_key'
+        return False,response
+
+    return True,response
+
 def getInstanceID():
     instance_id = 'i-0cb0d00c76e58046a'
 
@@ -226,6 +248,56 @@ def getAllElasticIPs():
 
     return elastic_ips
 
+def getAllSnapshots():
+    snapshots = {'Snapshots_IDs':{}}
+
+    snapshots_count = 0
+    snapshots_list = []
+
+    client = boto3.client('ec2')
+    results = client.describe_snapshots()
+
+    for snapshot in results['Snapshots']:
+        snapshots_count += 1
+        snapshots_list.append(
+            {
+                'SnapshotId':snapshot['SnapshotId'],
+                'State':snapshot['State'],
+                'Attached_Volume':snapshot['VolumeId'],
+                'Description':snapshot['Description'],
+            }
+        )
+
+    snapshots['Snapshots_IDs'].update({'Count':snapshots_count,'Details':snapshots_list})
+
+    return snapshots
+
+def getAllImages():
+    images = {'Image_IDs':{}}
+
+    images_count = 0
+    images_list = []
+
+    client = boto3.client('ec2')
+    results = client.describe_images()
+
+    for image in results['Images']:
+        images_count += 1
+        images_list.append(
+            {
+                'ImageId':image['ImageId'],
+                'ImageType':image['ImageType'],
+                'Platform':image['Platform'],
+                'State':image['State'],
+                'Description':image['Description'],
+                'Name':image['Name'],
+            }
+        )
+
+    images['Image_IDs'].update({'Count':images_count,'Details':images_list})
+
+    return images
+
 def getCredentials():
     results = {'State':'Development','Results':'Not Available'}
 
@@ -281,25 +353,3 @@ def addPublicKey(public_key=None):
         results = {'State':'Production','Status':'Successful'}
 
     return results
-
-def hashPlainText(plaintext):
-    plaintext_byte = plaintext.encode('utf-8')
-    hashedtext = hashlib.sha256(plaintext_byte).hexdigest()
-    return hashedtext
-
-def validate(secret_key):
-    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
-
-    if secret_key == None:
-        response['HTTPStatus'] = 'Bad request'
-        response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please specify a secret_key to access information'
-        return False,response
-
-    if hashPlainText(secret_key) != ACCOUNT_SECRET_KEY:
-        response['HTTPStatus'] = 'Unauthorized'
-        response['HTTPStatusCode'] = '401'
-        response['Message'] = 'Please enter a valid secret_key'
-        return False,response
-
-    return True,response

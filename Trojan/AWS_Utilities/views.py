@@ -509,3 +509,99 @@ def volume_getInfo(request):
         response['Error'] = e.args[0]
 
     return JsonResponse(response)
+
+# Request:
+#
+def snapshot_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        client = boto3.client('ec2')
+        response.update(client.describe_snapshots())
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - snapshot_id
+#
+def snapshot_getInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    snapshot_id = request.GET.get('snapshot_id')
+    if snapshot_id == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a snapshot_id'
+        JsonResponse(response)
+
+    try:
+        client = boto3.client('ec2')
+        response.update(
+            client.describe_snapshots(
+                SnapshotIds=[
+                    snapshot_id,
+                ]
+            )
+        )
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def image_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        client = boto3.client('ec2')
+        response.update(client.describe_images())
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - image_id
+#
+def image_getInfo(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    image_id = request.GET.get('image_id')
+    if image_id == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify an image_id'
+        JsonResponse(response)
+
+    try:
+        client = boto3.client('ec2')
+        response.update(
+            client.describe_images(
+                ImageIds=[
+                    image_id,
+                ]
+            )
+        )
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
