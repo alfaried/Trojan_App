@@ -236,15 +236,47 @@ def getCredentials():
 
         with open(file_path_credentials,'r') as file_output:
             file_output.readline()
-
             for line in file_output.readlines():
                 results_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
 
         with open(file_path_config,'r') as file_output:
             file_output.readline()
-
             for line in file_output.readlines():
                 results_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
 
-    results['Results'] = results_dict
+        results['Results'] = results_dict
+
+    return results
+
+def getPublicKey():
+    results = {'State':'Development','Results':'Not Available'}
+
+    if not DEBUG:
+        file_path_keys = '/home/ec2-user/.ssh/authorized_keys'
+        results['State'] = 'Production'
+        results_dict = []
+
+        with open(file_path_keys,'r') as file_output:
+            file_output.readline()
+            for line in file_output.readlines():
+                if 'ssh-rsa' in line:
+                    results_dict.append(line)
+
+        results['Results'] = results_dict
+
+    return results
+
+def addPublicKey(public_key=None):
+    results = {'State':'Development','Status':'Unsuccessful'}
+
+    if not DEBUG:
+        if 'ssh-rsa' not in public_key:
+            public_key = 'ssh-rsa ' + public_key
+
+        pk_dir = '/home/ec2-user/.ssh/authorized_keys'
+        bashCommand = 'sudo bash -c "echo ' + public_key + ' >> ' + pk_dir + '"'
+        subprocess.Popen(shlex.split(bashCommand), stdout=subprocess.PIPE)
+
+        results = {'State':'Production','Status':'Successful'}
+
     return results

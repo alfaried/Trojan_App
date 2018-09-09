@@ -34,6 +34,47 @@ def account_getInfo(request):
     return JsonResponse(response)
 
 # Request:
+# - public_key
+#
+def account_addPublicKey(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    public_key = request.GET.get('public_key')
+
+    try:
+        if public_key == None:
+            response['HTTPStatus'] = 'Bad request'
+            response['HTTPStatusCode'] = '400'
+            response['Message'] = 'Please specify an public_key'
+            return JsonResponse(response)
+
+        response.update(addPublicKey(public_key))
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def account_getPublicKeys(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        response.update(getPublicKey())
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
 #
 def instance_dashboard(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
@@ -67,7 +108,8 @@ def instance_start(request):
     if instance_id == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please specify an instance id'
+        response['Message'] = 'Please specify an instance_id'
+        return JsonResponse(response)
 
     ec2 = boto3.client('ec2')
 
@@ -103,7 +145,8 @@ def instance_stop(request):
     if instance_id == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please specify an instance id'
+        response['Message'] = 'Please specify an instance_id'
+        return JsonResponse(response)
 
     ec2 = boto3.client('ec2')
 
@@ -214,6 +257,12 @@ def cloudwatch_getMetric(request,attempts=0):
     name = request.GET.get('name')
     period = request.GET.get('period')
 
+    if namespace == None or name == None or period == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a namespace, name and period'
+        return JsonResponse(response)
+
     try:
         client = boto3.client('cloudwatch', region_name='ap-southeast-1')
 
@@ -256,7 +305,7 @@ def cloudwatch_getAvailableMetrics(request):
     if namespace == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Message'] = 'Please indicate a namespace (i.e. AWS/EC2, AWS/ELB, AWS/EBS)'
+        response['Message'] = 'Please indicate a namespace'
         return JsonResponse(response)
 
     try:
@@ -309,7 +358,7 @@ def loadbalancer_getInfo(request):
         if loadbalancer_name == None:
             response['HTTPStatus'] = 'Bad request'
             response['HTTPStatusCode'] = '400'
-            response['Message'] = 'Please specify loadbalancer_name'
+            response['Message'] = 'Please specify loadbalancer_name. Do take note, this is specifically for Classic Load Balancers.'
             return JsonResponse(response)
 
         client = boto3.client('elb')
@@ -358,7 +407,7 @@ def loadbalancerV2_getInfo(request):
         if loadbalancer_arn == None:
             response['HTTPStatus'] = 'Bad request'
             response['HTTPStatusCode'] = '400'
-            response['Message'] = 'Please specify loadbalancer_arn'
+            response['Message'] = 'Please specify loadbalancer_arn. Do take note, this is for Application and Network Load Balancers.'
             return JsonResponse(response)
 
         client = boto3.client('elbv2')
