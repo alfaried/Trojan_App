@@ -239,5 +239,5 @@ def getCredentials():
             for line in file_output.readlines():
                 results_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
 
-    # results['Results'] = results_dict
+    results['Results'] = results_dict
     return results
