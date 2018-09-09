@@ -21,10 +21,10 @@ def account_getInfo(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200, 'User':{}}
 
     secret_key = request.GET.get('secret_key')
-    status,response = validate(secret_key)
+    status,results = validate(secret_key)
 
     if not status:
-        return JsonResponse(response)
+        return JsonResponse(results)
 
     try:
         client = boto3.client('sts')
@@ -58,10 +58,10 @@ def account_addPublicKey(request):
         return JsonResponse(response)
 
     secret_key = request.GET.get('secret_key')
-    status,response = validate(secret_key)
+    status,results = validate(secret_key)
 
     if not status:
-        return JsonResponse(response)
+        return JsonResponse(results)
 
     try:
         response.update(addPublicKey(public_key))
@@ -81,10 +81,10 @@ def account_getPublicKeys(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     secret_key = request.GET.get('secret_key')
-    status,response = validate(secret_key)
+    status,results = validate(secret_key)
 
     if not status:
-        return JsonResponse(response)
+        return JsonResponse(results)
 
     try:
         response.update(getPublicKey())
@@ -135,10 +135,10 @@ def instance_start(request):
         return JsonResponse(response)
 
     secret_key = request.GET.get('secret_key')
-    status,response = validate(secret_key)
+    status,results = validate(secret_key)
 
     if not status:
-        return JsonResponse(response)
+        return JsonResponse(results)
 
     ec2 = boto3.client('ec2')
 
@@ -178,10 +178,10 @@ def instance_stop(request):
         return JsonResponse(response)
 
     secret_key = request.GET.get('secret_key')
-    status,response = validate(secret_key)
+    status,results = validate(secret_key)
 
     if not status:
-        return JsonResponse(response)
+        return JsonResponse(results)
 
     ec2 = boto3.client('ec2')
 
