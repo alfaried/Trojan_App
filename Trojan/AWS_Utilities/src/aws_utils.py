@@ -229,13 +229,20 @@ def getCredentials():
     results = {'State':'Development','Results':'Not Available'}
 
     if not DEBUG:
-        file_path = '/home/ec2-user/.aws/credentials'
+        file_path_credentials = '/home/ec2-user/.aws/credentials'
+        file_path_config = '/home/ec2-user/.aws/config'
+        results['State'] = 'Production'
+        results_dict = {}
 
-        with open(file_path,'r') as file_output:
+        with open(file_path_credentials,'r') as file_output:
             file_output.readline()
 
-            results['State'] = 'Production'
-            results_dict = {}
+            for line in file_output.readlines():
+                results_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
+
+        with open(file_path_config,'r') as file_output:
+            file_output.readline()
+
             for line in file_output.readlines():
                 results_dict.update({line.split('=')[0]:line.split('=')[1].strip()})
 
