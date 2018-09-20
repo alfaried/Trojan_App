@@ -290,6 +290,8 @@ def instance_create(request):
 
         if number_of_instances == None:
             number_of_instances = 1
+        else:
+            number_of_instances = int(number_of_instances)
 
         ec2 = boto3.resource('ec2')
         instances_list = ec2.create_instances(
