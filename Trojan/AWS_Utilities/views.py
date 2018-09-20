@@ -307,7 +307,7 @@ def instance_create(request):
             ],
             ImageId=image_id,
             InstanceType='t2.micro',
-            KeyName='Test',
+            KeyName='CLE',
             MaxCount=number_of_instances,
             MinCount=1,
             Monitoring={
