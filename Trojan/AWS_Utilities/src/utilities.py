@@ -234,23 +234,58 @@ def getAllVolumes():
 def getAllElasticIPs():
     elastic_ips = {'Elastic_IPs':{}}
 
-    count = 0
+    elastic_ips_assigned = getElasticIPs_Assigned()
+    elastic_ips_unassgined = getElasticIPs_Unassigned()
+
+    elastic_ips['Elastic_IPs']['Assgined'] = elastic_ips_assigned['Elastic_IPs']
+    elastic_ips['Elastic_IPs']['Unassgined'] = elastic_ips_unassgined['Elastic_IPs']
+
+    return elastic_ips
+
+def getElasticIPs_Assigned():
+    elastic_ips = {'Elastic_IPs':{}}
+
     list = []
 
     client = boto3.client('ec2')
     results = client.describe_addresses()
 
     for ips in results['Addresses']:
-        count += 1
-        list.append(
-            {
-                'InstanceId':ips['InstanceId'],
-                'PublicIp':ips['PublicIp'],
-                'Domain':ips['Domain'],
-            }
-        )
+        try:
+            list.append(
+                {
+                    'InstanceId':ips['InstanceId'],
+                    'PublicIp':ips['PublicIp'],
+                    'Domain':ips['Domain'],
+                }
+            )
+        except:
+            pass
 
-    elastic_ips['Elastic_IPs'].update({'Count':count,'Details':list})
+    elastic_ips['Elastic_IPs'] = list
+
+    return elastic_ips
+
+def getElasticIPs_Unassigned():
+    elastic_ips = {'Elastic_IPs':{}}
+
+    list = []
+
+    client = boto3.client('ec2')
+    results = client.describe_addresses()
+
+    for ips in results['Addresses']:
+        try:
+            ips['InstanceId']
+        except:
+            list.append(
+                {
+                    'PublicIp':ips['PublicIp'],
+                    'AllocationId':ips['AllocationId'],
+                }
+            )
+
+    elastic_ips['Elastic_IPs'] = list
 
     return elastic_ips
 

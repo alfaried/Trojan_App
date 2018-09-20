@@ -208,13 +208,133 @@ def instance_stop(request):
 
     return JsonResponse(response)
 
+# Request:
+# - instance_id
+# - secret_key
+#
+def instance_terminate(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    instance_id = request.GET.get('instance_id')
+    if instance_id == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify an instance_id'
+        return JsonResponse(response)
+
+    secret_key = request.GET.get('secret_key')
+    status,results = validate(secret_key)
+
+    if not status:
+        return JsonResponse(results)
+
+    ec2 = boto3.client('ec2')
+
+    # Do a dryrun first to verify permissions
+    try:
+        ec2.terminate_instances(InstanceIds=[instance_id], DryRun=True)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'UnauthorizedOperation':
+            response['HTTPStatus'] = 'Unauthorized'
+            response['HTTPStatusCode'] = '401'
+            response['Message'] = 'Dry run failed'
+            response['Error'] = e.args[0]
+
+    # Dry run succeeded, call stop_instances without dryrun
+    try:
+        results = ec2.terminate_instances(InstanceIds=[instance_id], DryRun=False)
+        response.update(results)
+    except Exception as e:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
 # TO-DO
 # Request:
 # - instance_id
 # - secret_key
 #
-def instance_overload(erquest):
+def instance_overload(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+    return JsonResponse(response)
+
+# Request:
+# - image_id
+# - snapshot_id
+# - count
+# - secret_key
+#
+def instance_create(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    new_instances = []
+
+    image_id = request.GET.get('image_id')
+    snapshot_id = request.GET.get('snapshot_id')
+    number_of_instances = request.GET.get('count')
+
+    secret_key = request.GET.get('secret_key')
+    status,results = validate(secret_key)
+
+    if not status:
+        return JsonResponse(results)
+
+    try:
+        if image_id == None or snapshot_id == None:
+            response['HTTPStatus'] = 'Bad request'
+            response['HTTPStatusCode'] = '400'
+            response['Message'] = 'Please specify image_id and snapshot_id'
+            return JsonResponse(response)
+
+        if number_of_instances == None:
+            number_of_instances = 1
+
+        ec2 = boto3.resource('ec2')
+        instances_list = ec2.create_instances(
+            BlockDeviceMappings=[
+                {
+                    'DeviceName': '/dev/xvda',
+                    'VirtualName': 'ephemeral0',
+                    'Ebs': {
+                        'DeleteOnTermination': True,
+                        'SnapshotId': snapshot_id,
+                        'VolumeSize': 10,
+                        'VolumeType': 'gp2',
+                    },
+                },
+            ],
+            ImageId=image_id,
+            InstanceType='t2.micro',
+            KeyName='Test',
+            MaxCount=number_of_instances,
+            MinCount=1,
+            Monitoring={
+                'Enabled': False
+            },
+            SecurityGroups=[
+                'Auto-Instance-Security-Group',
+            ],
+            DisableApiTermination=False,
+            EbsOptimized=False,
+            InstanceInitiatedShutdownBehavior='stop',
+        )
+
+        for instance in instances_list:
+            new_instances.append(
+                {
+                    'instance_id':instance.instance_id,
+                }
+            )
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    response['instance_ids'] = new_instances
     return JsonResponse(response)
 
 # Request:
@@ -282,6 +402,60 @@ def instance_getInfo(request):
             ],
         )
         response.update(instances)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def elasticIP_getAll(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        results = getAllElasticIPs()
+        response.update(results)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - instance_id
+# - allocation_id
+#
+def elasticIP_associate(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    instance_id = request.GET.get('instance_id')
+    allocation_id = request.GET.get('allocation_id')
+    public_ip = ''
+
+    try:
+        ec2 = boto3.client('ec2')
+        results = ec2.associate_address(
+            AllocationId=allocation_id,
+            InstanceId=instance_id,
+        )
+
+        elastic_ips = getElasticIPs_Assigned()['Elastic_IPs']
+        for ip in elastic_ips:
+            if ip['InstanceId'] == instance_id:
+                public_ip = ip['PublicIp']
+
+        response['Response'] ={
+            'instance_id':instance_id,
+            'association_id':results['AssociationId'],
+            'instance_public_ip':public_ip,
+        }
 
     except Exception as e:
         traceback.print_exc()
