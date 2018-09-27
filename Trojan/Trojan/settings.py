@@ -31,7 +31,7 @@ ACCOUNT_SECRET_KEY = '4c81cc820321d84eb2963b3c5c85a11e77d3b9510790b326f42a66c35e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (len(sys.argv) == 2)
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1',PUBLIC_IP,'Trojan-ALB-1000519366.ap-southeast-1.elb.amazonaws.com']
+ALLOWED_HOSTS = ['localhost','127.0.0.1',PUBLIC_IP]
 
 
 # Application definition

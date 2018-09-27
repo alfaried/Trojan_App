@@ -1,6 +1,7 @@
 import boto3
 import hashlib
 import requests
+import shlex, subprocess
 from Trojan.settings import DEBUG, ACCOUNT_SECRET_KEY
 
 def hashPlainText(plaintext):
