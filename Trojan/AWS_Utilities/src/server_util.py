@@ -5,3 +5,6 @@ import shlex, subprocess
 def executeBash(bashCommand):
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     return process.communicate()
+
+def changeFilePermission(permission,filepath):
+    return False

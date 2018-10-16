@@ -2,7 +2,7 @@ import boto3
 import hashlib
 import requests
 import shlex, subprocess
-from AWS_Utilities.src import config
+from AWS_Utilities.src import config, server_util
 from Trojan.settings import DEBUG, ACCOUNT_SECRET_KEY
 
 def hashPlainText(plaintext):
@@ -410,16 +410,34 @@ def addPublicKey(public_key=None):
     return results
 
 def addAWSCredentials(access_key,secret_access_key,region_name,output_file):
+    credentials_can_write = False
+    config_can_write = False
+
     if not DEBUG:
         file_path_credentials = config.AWS_CREDENTIALS_FILE
         file_path_config = config.AWS_CONFIG_FILE
 
-        with open(file_path_credentials,'w') as file_output:
-            file_output.write('[default]\n')
-            file_output.write('aws_access_key_id = ' + access_key.strip() + '\n')
-            file_output.write('aws_secret_access_key = ' + secret_access_key.strip() + '\n')
+        credentials_can_write = server_util.changeFilePermission(775,file_path_credentials) # This will return True : UNLOCK
+        config_can_write = server_util.changeFilePermission(775,file_path_config)           # This will return True : UNLOCK
 
-        with open(file_path_config,'r') as file_output:
-            file_output.write('[default]\n')
-            file_output.write('region = ' + region_name.strip() + '\n')
-            file_output.write('output = ' + output_file.strip() + '\n')
+        if credentials_can_write:
+            with open(file_path_credentials,'w') as file_output:
+                file_output.write('[default]\n')
+                file_output.write('aws_access_key_id = ' + access_key.strip() + '\n')
+                file_output.write('aws_secret_access_key = ' + secret_access_key.strip() + '\n')
+
+            credentials_can_write = server_util.changeFilePermission(400,file_path_credentials) # This will return False : LOCK
+
+        if config_can_write:
+            with open(file_path_config,'r') as file_output:
+                file_output.write('[default]\n')
+                file_output.write('region = ' + region_name.strip() + '\n')
+                file_output.write('output = ' + output_file.strip() + '\n')
+
+            config_can_write = server_util.changeFilePermission(400,file_path_config)           # This will return False : LOCK
+
+    if credentials_can_write:
+        raise Exception('Credentials file is still unlock. Please check. Security hazard!')
+
+    if config_can_write:
+        raise Exception('Config file is still unlock. Please check. Security hazard!')
