@@ -2,6 +2,7 @@ import boto3
 import hashlib
 import requests
 import shlex, subprocess
+from AWS_Utilities.src import config
 from Trojan.settings import DEBUG, ACCOUNT_SECRET_KEY
 
 def hashPlainText(plaintext):
@@ -356,8 +357,8 @@ def getCredentials():
     results = {'State':'Development','Results':'Not Available'}
 
     if not DEBUG:
-        file_path_credentials = '/home/ec2-user/.aws/credentials'
-        file_path_config = '/home/ec2-user/.aws/config'
+        file_path_credentials = config.AWS_CREDENTIALS_FILE
+        file_path_config = config.AWS_CONFIG_FILE
         results['State'] = 'Production'
         results_dict = {}
 
@@ -379,7 +380,7 @@ def getPublicKey():
     results = {'State':'Development','Results':'Not Available'}
 
     if not DEBUG:
-        file_path_keys = '/home/ec2-user/.ssh/authorized_keys'
+        file_path_keys = config.SSH_KEYS_FILE
         results['State'] = 'Production'
         results_dict = []
 
@@ -407,3 +408,15 @@ def addPublicKey(public_key=None):
         results = {'State':'Production','Status':'Successful'}
 
     return results
+
+def addAWSCredentials(access_key,secret_access_key,region_name,output_file):
+    if not DEBUG:
+        with open(file_path_credentials,'w') as file_output:
+            file_output.write('[default]\n')
+            file_output.write('aws_access_key_id = ' + access_key.strip() + '\n')
+            file_output.write('aws_secret_access_key = ' + secret_access_key.strip() + '\n')
+
+        with open(file_path_config,'r') as file_output:
+            file_output.write('[default]\n')
+            file_output.write('region = ' + region_name.strip() + '\n')
+            file_output.write('output = ' + output_file.strip() + '\n')
