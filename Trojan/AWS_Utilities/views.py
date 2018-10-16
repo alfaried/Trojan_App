@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
-from AWS_Utilities.src import utilities
+from AWS_Utilities.src.utilities import *
 from botocore.exceptions import ClientError
 
 # Request:
@@ -69,7 +69,7 @@ def account_updateAWSCredentials(request):
     output_file = 'json' if request.GET.get('output_file') == None else request.GET.get('output_file')
 
     try:
-        utilities.addAWSCredentials(access_key,secret_access_key,region_name,output_file)
+        addAWSCredentials(access_key,secret_access_key,region_name,output_file)
 
     except Exception as e:
         traceback.print_exc()
