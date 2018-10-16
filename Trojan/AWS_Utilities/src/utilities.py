@@ -401,7 +401,7 @@ def addPublicKey(public_key=None):
             public_key = 'ssh-rsa ' + public_key
 
         pk_dir = config.SSH_KEYS_FILE
-        server_util.addPublicKey(public_key,pk_dir)
+        server_util.addPublicKeyToFile(public_key,pk_dir)
 
         results = {'State':'Production','Status':'Successful'}
 
@@ -412,5 +412,5 @@ def addAWSCredentials(access_key,secret_access_key,region_name,output_file):
         file_path_credentials = config.AWS_CREDENTIALS_FILE
         file_path_config = config.AWS_CONFIG_FILE
 
-        server_util.addAWSCredentials(access_key,secret_access_key)
-        server_util.addAWSConfig(region_name,output_file)
+        server_util.addAWSCredentialsToFile(access_key,secret_access_key)
+        server_util.addAWSConfigToFile(region_name,output_file)

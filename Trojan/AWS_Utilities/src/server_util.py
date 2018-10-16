@@ -10,11 +10,11 @@ def executeSudoBash(bashCommand):
     process = subprocess.Popen(shlex.split(bashCommand), stdout=subprocess.PIPE)
     return process.communicate()
 
-def addPublicKey(public_key,filepath):
+def addPublicKeyToFile(public_key,filepath):
     bashCommand = 'sudo bash -c "echo ' + public_key + ' >> ' + filepath + '"'
     return executeSudoBash(bashCommand)
 
-def addAWSCredentials(access_key,secret_access_key,filepath):
+def addAWSCredentialsToFile(access_key,secret_access_key,filepath):
     # User profile
     bashCommand = 'sudo bash -c "echo [deafult] >> ' + filepath + '"'
     executeSudoBash(bashCommand)
@@ -27,7 +27,7 @@ def addAWSCredentials(access_key,secret_access_key,filepath):
     bashCommand = 'sudo bash -c "echo ' + secret_access_key + ' > ' + filepath + '"'
     executeSudoBash(bashCommand)
 
-def addAWSConfig(region_name,output_format,filepath):
+def addAWSConfigToFile(region_name,output_format,filepath):
     # User profile
     bashCommand = 'sudo bash -c "echo [deafult] >> ' + filepath + '"'
     executeSudoBash(bashCommand)
