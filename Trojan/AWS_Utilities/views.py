@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
-from AWS_Utilities.src.utilities import *
+from AWS_Utilities.src import utilities
 from botocore.exceptions import ClientError
 
 # Request:
