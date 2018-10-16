@@ -411,6 +411,9 @@ def addPublicKey(public_key=None):
 
 def addAWSCredentials(access_key,secret_access_key,region_name,output_file):
     if not DEBUG:
+        file_path_credentials = config.AWS_CREDENTIALS_FILE
+        file_path_config = config.AWS_CONFIG_FILE
+
         with open(file_path_credentials,'w') as file_output:
             file_output.write('[default]\n')
             file_output.write('aws_access_key_id = ' + access_key.strip() + '\n')
