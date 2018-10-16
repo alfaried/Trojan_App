@@ -51,8 +51,8 @@ def account_getInfo(request):
 def account_updateAWSCredentials(request):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200, 'User':{}}
 
-    access_key = request.GET.get('access_key')
-    secret_access_key = request.GET.get('secret_access_key')
+    access_key = request.GET.get('access_key').replace(' ','+')
+    secret_access_key = request.GET.get('secret_access_key').replace(' ','+')
     if access_key == None or secret_access_key == None:
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
