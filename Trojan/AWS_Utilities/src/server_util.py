@@ -16,7 +16,7 @@ def addPublicKeyToFile(public_key,filepath):
 
 def addAWSCredentialsToFile(access_key,secret_access_key,filepath):
     # User profile
-    bashCommand = 'sudo bash -c "echo [deafult] > ' + filepath + '"'
+    bashCommand = 'sudo bash -c "echo [default] > ' + filepath + '"'
     executeSudoBash(bashCommand)
 
     # Access Key
@@ -29,7 +29,7 @@ def addAWSCredentialsToFile(access_key,secret_access_key,filepath):
 
 def addAWSConfigToFile(region_name,output_format,filepath):
     # User profile
-    bashCommand = 'sudo bash -c "echo [deafult] > ' + filepath + '"'
+    bashCommand = 'sudo bash -c "echo [default] > ' + filepath + '"'
     executeSudoBash(bashCommand)
 
     # Region Name
