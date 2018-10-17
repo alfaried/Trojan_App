@@ -5,6 +5,7 @@ from django.urls import path
 urlpatterns = [
     path('', views.test, name='test'),
     path('account/get/', views.account_getInfo, name='account_getInfo'),
+    path('account/aws/update/', views.account_updateAWSCredentials, name='account_updateAWSCredentials'),
     path('account/keys/add/', views.account_addPublicKey, name='account_addPublicKey'),
     path('account/keys/get/', views.account_getPublicKeys, name='account_getPublicKeys'),
     path('ec2/dashboard/', views.instance_dashboard, name='instance_dashboard'),

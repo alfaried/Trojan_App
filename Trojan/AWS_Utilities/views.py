@@ -45,6 +45,43 @@ def account_getInfo(request):
     return JsonResponse(response)
 
 # Request:
+# - access_key
+# - secret_access_key
+# - secret_key
+#
+def account_updateAWSCredentials(request):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200, 'User':{}}
+
+    access_key = request.GET.get('access_key').replace(' ','+')
+    secret_access_key = request.GET.get('secret_access_key').replace(' ','+')
+    if access_key == None or secret_access_key == None:
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Message'] = 'Please specify a access_key and a secret_access_key'
+        return JsonResponse(response)
+
+    secret_key = request.GET.get('secret_key')
+    status,results = validate(secret_key)
+
+    if not status:
+        return JsonResponse(results)
+
+    region_name = 'ap-southeast-1' if request.GET.get('region_name') == None else request.GET.get('region_name')
+    output_file = 'json' if request.GET.get('output_file') == None else request.GET.get('output_file')
+
+    try:
+        addAWSCredentials(access_key,secret_access_key,region_name,output_file)
+
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    response['User'].update(getCredentials())
+    return JsonResponse(response)
+
+# Request:
 # - secret_key
 # - public_key
 #

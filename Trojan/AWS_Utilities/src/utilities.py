@@ -1,7 +1,7 @@
 import boto3
 import hashlib
 import requests
-import shlex, subprocess
+from AWS_Utilities.src import config, server_util
 from Trojan.settings import DEBUG, ACCOUNT_SECRET_KEY
 
 def hashPlainText(plaintext):
@@ -356,8 +356,8 @@ def getCredentials():
     results = {'State':'Development','Results':'Not Available'}
 
     if not DEBUG:
-        file_path_credentials = '/home/ec2-user/.aws/credentials'
-        file_path_config = '/home/ec2-user/.aws/config'
+        file_path_credentials = config.AWS_CREDENTIALS_FILE
+        file_path_config = config.AWS_CONFIG_FILE
         results['State'] = 'Production'
         results_dict = {}
 
@@ -379,7 +379,7 @@ def getPublicKey():
     results = {'State':'Development','Results':'Not Available'}
 
     if not DEBUG:
-        file_path_keys = '/home/ec2-user/.ssh/authorized_keys'
+        file_path_keys = config.SSH_KEYS_FILE
         results['State'] = 'Production'
         results_dict = []
 
@@ -400,10 +400,17 @@ def addPublicKey(public_key=None):
         if 'ssh-rsa' not in public_key:
             public_key = 'ssh-rsa ' + public_key
 
-        pk_dir = '/home/ec2-user/.ssh/authorized_keys'
-        bashCommand = 'sudo bash -c "echo ' + public_key + ' >> ' + pk_dir + '"'
-        subprocess.Popen(shlex.split(bashCommand), stdout=subprocess.PIPE)
+        pk_dir = config.SSH_KEYS_FILE
+        server_util.addPublicKeyToFile(public_key,pk_dir)
 
         results = {'State':'Production','Status':'Successful'}
 
     return results
+
+def addAWSCredentials(access_key,secret_access_key,region_name,output_file):
+    if not DEBUG:
+        file_path_credentials = config.AWS_CREDENTIALS_FILE
+        file_path_config = config.AWS_CONFIG_FILE
+
+        server_util.addAWSCredentialsToFile(access_key,secret_access_key,file_path_credentials)
+        server_util.addAWSConfigToFile(region_name,output_file,file_path_config)
