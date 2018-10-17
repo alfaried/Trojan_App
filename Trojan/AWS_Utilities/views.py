@@ -8,6 +8,7 @@ from Trojan.settings import PUBLIC_IP
 from AWS_Utilities.src.utilities import *
 from botocore.exceptions import ClientError
 
+
 # Request:
 #
 def test(request):
@@ -816,3 +817,13 @@ def image_getInfo(request):
         response['Error'] = e.args[0]
 
     return JsonResponse(response)
+
+def send_signal(requests):
+    import requests as req
+    try:
+        url = "http://52.77.157.29:8999/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP
+        print(url)
+        response = req.get(url)
+        #jsonObj = json.loads(response.content.decode())
+    except:
+        pass
