@@ -857,10 +857,14 @@ def image_getInfo(request):
 
 def send_signal(requests):
     import requests as req
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
     try:
-        url = "http://52.77.157.29:8999/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP
-        print(url)
-        response = req.get(url)
-        #jsonObj = json.loads(response.content.decode())
+        url = "http://52.77.157.29:8000/event/recovery/?secret_key=m0nKEY&ip=13.251.174.119" #+ PUBLIC_IP #Test server
+        #url = "http://cloudtoupus:8000/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP #Production server
+        #print(url)
+        resp = req.get(url)  
     except:
-        pass
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+    
+    return JsonResponse(response)
