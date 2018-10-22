@@ -859,7 +859,7 @@ def send_signal(requests):
     import requests as req
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
     try:
-        url = "http://52.77.157.29:8000/event/recovery/?secret_key=m0nKEY&ip=13.251.174.119" #+ PUBLIC_IP #Test server
+        url = "http://52.77.157.29:8000/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP #Test server
         #url = "http://cloudtoupus:8000/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP #Production server
         #print(url)
         resp = req.get(url)  
