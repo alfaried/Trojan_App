@@ -894,6 +894,6 @@ def event_stopWebApp(requests):
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Error'] = e.args[0]
+        response['Error'] = traceback.print_exc()
 
     return JsonResponse(response)
