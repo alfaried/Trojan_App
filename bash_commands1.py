@@ -14,4 +14,4 @@ def getPID():
     return executeBash(bashCommand)
 
 if __name__ == '__main__':
-    print(getPID())
+    print(getPID()[0].decode('utf-8').strip())
