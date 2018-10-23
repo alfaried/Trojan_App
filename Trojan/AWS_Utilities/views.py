@@ -855,11 +855,13 @@ def image_getInfo(request):
 
     return JsonResponse(response)
 
+# Request:
+#
 def send_signal(requests):
     import requests as req
 
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
-    
+
     try:
         url = "http://52.77.157.29:8000/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP #Test server
         #url = "http://cloudtoupus:8000/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP #Production server
