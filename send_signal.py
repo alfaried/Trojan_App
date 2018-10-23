@@ -13,7 +13,7 @@ def send_signal(public_ip):
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
 
-    return JsonResponse(response)
+    return response
 
 if __name__ == '__main__':
     send_signal(ipgetter.myip())
