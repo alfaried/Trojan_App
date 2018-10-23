@@ -1,6 +1,3 @@
 #!/bin/bash
-clear
-cd /home/ec2-user/.trojan/trojan_env
-. bin/activate
-cd Trojan_App
-python recovery.py
+ip_address=$(dig +short myip.opendns.com @resolver1.opendns.com)
+curl "http://$ip_address:8999/event/recovery/send_information/"

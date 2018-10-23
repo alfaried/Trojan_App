@@ -1,4 +1,3 @@
-import os
 import ipgetter
 import shlex, subprocess
 
