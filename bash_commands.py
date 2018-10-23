@@ -13,7 +13,7 @@ def getPID():
     bashCommand = "fuser 8000/tcp"
     return executeBash(bashCommand)
 
-def stopWebApp(pid):
+def stopWebApp(pid=None):
     bashCommand = ''
 
     if pid == None:
