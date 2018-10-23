@@ -50,6 +50,6 @@ def stopWebApp(pid=None,port_number=None):
         bashCommand = 'sudo bash -c "fuser -k ' + port_number + '/tcp"'
 
     if pid != None:
-        bashCommand = "kill " + pid
+        bashCommand = 'sudo bash -c "kill ' + pid + '"'
 
     executeSudoBash(bashCommand)
