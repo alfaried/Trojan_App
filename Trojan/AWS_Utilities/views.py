@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from Trojan.settings import PUBLIC_IP
 from AWS_Utilities.src.utilities import *
+from AWS_Utilities.src.server_util import *
 from botocore.exceptions import ClientError
 
 
