@@ -880,7 +880,7 @@ def event_sendSignal(requests):
 def event_stopWebApp(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
-    port_number = request.GET.get('port_number')
+    port_number = requests.GET.get('port_number')
 
     try:
         if port_number == None:
