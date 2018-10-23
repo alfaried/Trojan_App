@@ -25,4 +25,4 @@ def stopWebApp(pid):
 
 if __name__ == '__main__':
     pid = getPID()[0].decode('utf-8').strip()
-    stopWebApp(pid)
+    stopWebApp()
