@@ -887,13 +887,13 @@ def event_stopWebApp(requests):
         if port_number == None:
             raise Exception('Please specify a port_number')
 
-        stopWebApp(port_number=port_number)
         response['IP_Address'] = PUBLIC_IP
         response['Port_Number'] = port_number
+        stopWebApp(port_number=port_number)
     except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
-        response['Error'] = traceback.print_exc()
+        response['Error'] = e.args[0]
 
     return JsonResponse(response)
