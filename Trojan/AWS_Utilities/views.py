@@ -1,6 +1,7 @@
 import os
 import boto3
 import traceback
+import requests as req
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -857,9 +858,7 @@ def image_getInfo(request):
 
 # Request:
 #
-def send_signal(requests):
-    import requests as req
-
+def event_sendSignal(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
@@ -867,8 +866,33 @@ def send_signal(requests):
         #url = "http://cloudtoupus:8000/event/recovery/?secret_key=m0nKEY&ip=" + PUBLIC_IP #Production server
         #print(url)
         resp = req.get(url)
-    except:
+    except Exception as e:
+        traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
         response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+# - port_number
+#
+def event_stopWebApp(requests):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    port_number = request.GET.get('port_number')
+
+    try:
+        if port_number == None:
+            raise Exception('Please specify a port_number')
+
+        stopWebApp(port_number=port_number)
+        response['IP_Address'] = PUBLIC_IP
+        response['Port_Number'] = port_number
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
 
     return JsonResponse(response)

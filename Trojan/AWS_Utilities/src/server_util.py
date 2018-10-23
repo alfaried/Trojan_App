@@ -38,3 +38,18 @@ def addAWSConfigToFile(region_name,output_format,filepath):
     # Output File Format
     bashCommand = 'sudo bash -c "echo output = ' + output_format + ' >> ' + filepath + '"'
     executeSudoBash(bashCommand)
+
+def getPID(port_number):
+    bashCommand = "fuser " + port_number + "/tcp"
+    return executeBash(bashCommand)
+
+def stopWebApp(pid=None,port_number=None):
+    bashCommand = ''
+
+    if port_number != None:
+        bashCommand = "fuser -k " + port_number + "/tcp"
+
+    if pid != None:
+        bashCommand = "kill " + pid
+
+    executeBash(bashCommand)

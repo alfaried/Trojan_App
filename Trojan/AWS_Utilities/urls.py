@@ -31,5 +31,6 @@ urlpatterns = [
     path('elbv2/get/', views.loadbalancerV2_getInfo, name='loadbalancerV2_getInfo'),
     path('elb/list/', views.loadbalancer_getAll, name='loadbalancer_getAll'),
     path('elb/get/', views.loadbalancer_getInfo, name='loadbalancer_getInfo'),
-    path('event/recovery/send_information/', views.send_signal ),
+    path('event/recovery/send_information/', views.event_sendSignal, name='event_sendSignal'),
+    path('event/stop/web_application/', views.event_stopWebApp, name='event_stopWebApp'),
 ]
