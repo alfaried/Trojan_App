@@ -24,4 +24,5 @@ def stopWebApp(pid):
     return executeBash(bashCommand)
 
 if __name__ == '__main__':
-    stopWebApp(getPID())
+    pid = getPID().decode('utf-8').strip()
+    stopWebApp(pid)
