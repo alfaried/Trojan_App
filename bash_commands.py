@@ -10,8 +10,18 @@ def executeSudoBash(bashCommand):
     return process.communicate()
 
 def getPID():
-    bashCommand = "fuser 8999/tcp"
+    bashCommand = "fuser 8000/tcp"
+    return executeBash(bashCommand)
+
+def stopWebApp(pid):
+    bashCommand = ''
+
+    if pid == None:
+        bashCommand = "fuser -k 8000/tcp"
+    else:
+        bashCommand = "kill " + pid
+
     return executeBash(bashCommand)
 
 if __name__ == '__main__':
-    print(getPID()[0].decode('utf-8').strip())
+    stopWebApp(getPID())
