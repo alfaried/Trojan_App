@@ -897,3 +897,18 @@ def event_stopWebApp(requests):
         response['Error'] = e.args[0]
 
     return JsonResponse(response)
+
+# Request:
+#
+def instance_updateWebApp(requests):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        gitPull()
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)

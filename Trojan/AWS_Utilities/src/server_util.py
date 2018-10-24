@@ -53,3 +53,7 @@ def stopWebApp(pid=None,port_number=None):
         bashCommand = 'sudo bash -c "kill ' + pid + '"'
 
     executeSudoBash(bashCommand)
+
+def gitPull():
+    bashCommand = 'sudo bash -c "git pull"'
+    return executeSudoBash(bashCommand)
