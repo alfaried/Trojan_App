@@ -56,9 +56,9 @@ def stopWebApp(pid=None,port_number=None):
 
 def gitCommands(action):
     commands = {
-        'pull':'pull'
-        'fetch':'fetch'
-        'reset':'reset --hard origin/master'
+        'pull':'pull',
+        'fetch':'fetch',
+        'reset':'reset --hard origin/master',
     }
 
     bashCommand = 'sudo bash -c "git ' + commands[action] + '"'
