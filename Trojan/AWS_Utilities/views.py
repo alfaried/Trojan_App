@@ -904,7 +904,7 @@ def git_Pull(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
-        response['Bash_Response'] = gitCommands('pull')[0].decode('utf-8').strip()
+        response['Git_Response'] = gitCommands('pull')[0].decode('utf-8').strip()
         response['Message'] = 'Successfully git pull'
     except Exception as e:
         traceback.print_exc()
@@ -920,7 +920,7 @@ def git_Fetch(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
-        response['Bash_Response'] = gitCommands('fetch')
+        response['Git_Response'] = gitCommands('fetch')[0].decode('utf-8').strip()
         response['Message'] = 'Successfully git fetch'
     except Exception as e:
         traceback.print_exc()
@@ -936,7 +936,7 @@ def git_Reset(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
-        response['Bash_Response'] = gitCommands('reset')
+        response['Git_Response'] = gitCommands('reset')[0].decode('utf-8').strip()
         response['Message'] = 'Successfully git reset'
     except Exception as e:
         traceback.print_exc()
