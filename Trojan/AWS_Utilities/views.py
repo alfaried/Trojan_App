@@ -905,6 +905,7 @@ def instance_updateWebApp(requests):
 
     try:
         gitPull()
+        response['Message'] = 'Successfully git pulled'
     except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'
