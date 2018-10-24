@@ -904,7 +904,7 @@ def git_Pull(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
-        print(gitCommands('pull'))
+        response['Bash_Response'] = gitCommands('pull')[0].decode('utf-8').strip())
         response['Message'] = 'Successfully git pull'
     except Exception as e:
         traceback.print_exc()
