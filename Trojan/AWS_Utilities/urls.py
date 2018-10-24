@@ -9,6 +9,7 @@ urlpatterns = [
     path('account/keys/add/', views.account_addPublicKey, name='account_addPublicKey'),
     path('account/keys/get/', views.account_getPublicKeys, name='account_getPublicKeys'),
     path('ec2/dashboard/', views.instance_dashboard, name='instance_dashboard'),
+    path('ec2/instance/health_check/', views.test, name='test'),
     path('ec2/instance/list/', views.instance_getAll, name='instance_getAll'),
     path('ec2/instance/get/current/', views.instance_getCurentInfo, name='instance_getCurrentInfo'),
     path('ec2/instance/get/', views.instance_getInfo, name='instance_getInfo'),
