@@ -900,12 +900,44 @@ def event_stopWebApp(requests):
 
 # Request:
 #
-def instance_updateWebApp(requests):
+def git_Pull(requests):
     response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
 
     try:
-        gitPull()
-        response['Message'] = 'Successfully git pulled'
+        response['Bash_Response'] = gitCommands('pull')
+        response['Message'] = 'Successfully git pull'
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def git_Fetch(requests):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        response['Bash_Response'] = gitCommands('fetch')
+        response['Message'] = 'Successfully git fetch'
+    except Exception as e:
+        traceback.print_exc()
+        response['HTTPStatus'] = 'Bad request'
+        response['HTTPStatusCode'] = '400'
+        response['Error'] = e.args[0]
+
+    return JsonResponse(response)
+
+# Request:
+#
+def git_Reset(requests):
+    response = {'HTTPStatus':'OK', 'HTTPStatusCode':200}
+
+    try:
+        response['Bash_Response'] = gitCommands('reset')
+        response['Message'] = 'Successfully git reset'
     except Exception as e:
         traceback.print_exc()
         response['HTTPStatus'] = 'Bad request'

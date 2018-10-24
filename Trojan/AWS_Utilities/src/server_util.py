@@ -54,6 +54,12 @@ def stopWebApp(pid=None,port_number=None):
 
     executeSudoBash(bashCommand)
 
-def gitPull():
-    bashCommand = 'sudo bash -c "git pull"'
+def gitCommands(action):
+    commands = {
+        'pull':'pull'
+        'fetch':'fetch'
+        'reset':'reset --hard origin/master'
+    }
+
+    bashCommand = 'sudo bash -c "git ' + commands[action] + '"'
     return executeSudoBash(bashCommand)
