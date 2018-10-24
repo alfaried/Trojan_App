@@ -12,6 +12,7 @@ urlpatterns = [
     path('ec2/instance/list/', views.instance_getAll, name='instance_getAll'),
     path('ec2/instance/get/current/', views.instance_getCurentInfo, name='instance_getCurrentInfo'),
     path('ec2/instance/get/', views.instance_getInfo, name='instance_getInfo'),
+    path('ec2/instance/update/trojan/', views.instance_updateWebApp, name='instance_updateWebApp'),
     path('ec2/volume/list/', views.volume_getAll, name='volume_getAll'),
     path('ec2/volume/get/', views.volume_getInfo, name='volume_getInfo'),
     path('ec2/snapshot/list/', views.snapshot_getAll, name='snapshot_getAll'),
@@ -32,5 +33,5 @@ urlpatterns = [
     path('elb/list/', views.loadbalancer_getAll, name='loadbalancer_getAll'),
     path('elb/get/', views.loadbalancer_getInfo, name='loadbalancer_getInfo'),
     path('event/recovery/send_information/', views.event_sendSignal, name='event_sendSignal'),
-    path('event/stop/web_application/', views.event_stopWebApp, name='event_stopWebApp'),
+    path('event/stop/deployment/', views.event_stopWebApp, name='event_stopWebApp'),
 ]
